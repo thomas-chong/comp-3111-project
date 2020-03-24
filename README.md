@@ -1,4 +1,16 @@
 # COMP3111: Software Engineering Project - Course Scraper
+
+## Team Members [T-24]
+
+Member 1: CHONG, Cheuk Hei
+Member 1 Task: 1 & 5
+Member 2: LAW, Kai Yuet
+Member 2 Task: 2 & 3
+Member 3: LI, Lok Yin
+Member 3 Task: 4 & 6
+
+
+
 ## Project Problem Statement and Activities
 
 
