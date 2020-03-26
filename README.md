@@ -10,3 +10,6 @@
 > Task 2 & Task 3
 
 ## 3. LI, Lok Yin
+> email: lyliaf | github: justinlyli | dev_branch: justin-test
+> Task 4 & Task 6
+>  
