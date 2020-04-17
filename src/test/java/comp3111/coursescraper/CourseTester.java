@@ -1,11 +1,14 @@
 package comp3111.coursescraper;
 
 import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class CourseTester {
 	int[] arr;
+	
+	/*
+	 * 	countAB() Test Cases
+	 */
 	
 	@Test
 	public void A0B2_ALowerBoundaryValid() {
@@ -62,4 +65,3 @@ public class CourseTester {
 	}
 
 }
-
