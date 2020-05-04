@@ -87,25 +87,26 @@ public class Scraper {
 		client.getOptions().setJavaScriptEnabled(false);
 	}
 
-	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
-		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
+	private void addSlot(HtmlElement e, Section s, boolean secondRow) {
+		String times[] = e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
 			String code = times[0].substring(j , j + 2);
 			if (Slot.DAYS_MAP.get(code) == null)
 				break;
-			Slot s = new Slot();
-			s.setDay(Slot.DAYS_MAP.get(code));
-			s.setStart(times[1]);
-			s.setEnd(times[3]);
-			s.setVenue(venue);
-			c.addSlot(s);	
+			Slot sl = new Slot();
+			sl.setDay(Slot.DAYS_MAP.get(code));
+			sl.setStart(times[1]);
+			sl.setEnd(times[3]);
+			sl.setVenue(venue);
+			s.addSlot(sl);	
 		}
 
 	}
-
+	
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {
@@ -126,21 +127,48 @@ public class Scraper {
 				
 				List<?> popupdetailslist = (List<?>) htmlItem.getByXPath(".//div[@class='popupdetail']/table/tbody/tr");
 				HtmlElement exclusion = null;
+				HtmlElement attribute = null;
 				for ( HtmlElement e : (List<HtmlElement>)popupdetailslist) {
 					HtmlElement t = (HtmlElement) e.getFirstByXPath(".//th");
 					HtmlElement d = (HtmlElement) e.getFirstByXPath(".//td");
 					if (t.asText().equals("EXCLUSION")) {
 						exclusion = d;
 					}
+					if (t.asText().equals("ATTRIBUTES")) {
+						attribute = d;
+					}
 				}
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
+				if (attribute != null) {
+					if (attribute.asText().contains("4Y programs")) {
+						c.setIsCC(true);
+					}
+				}
 				
 				List<?> sections = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for ( HtmlElement e: (List<HtmlElement>)sections) {
-					addSlot(e, c, false);
+					// Parse section	
+					String name[] = e.getChildNodes().get(1).asText().split(" ");
+					String instructor[] = e.getChildNodes().get(5).asText().split("\n");
+					Section s = new Section();
+					s.setSection(name[0]);
+					s.setID(name[1].substring(1, 5));
+					for (int n = 0; n < instructor.length; ++n) {
+						Instructor in = new Instructor();
+						String instructorName[] = instructor[n].split(", ");
+						if (instructorName[0].contentEquals("TBA")) {
+							in.setInstructor("null", "null");
+							s.addInstructor(in);
+							break;
+						}
+						in.setInstructor(instructorName[1], instructorName[0]);
+						s.addInstructor(in);
+					}
+					addSlot(e, s, false);
 					e = (HtmlElement)e.getNextSibling();
 					if (e != null && !e.getAttribute("class").contains("newsect"))
-						addSlot(e, c, true);
+						addSlot(e, s, true);
+					c.addSection(s);
 				}
 				
 				result.add(c);
