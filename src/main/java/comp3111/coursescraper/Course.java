@@ -1,33 +1,52 @@
 package comp3111.coursescraper;
 
-
-
 public class Course {
-	private static final int DEFAULT_MAX_SLOT = 20;
+	private static final int DEFAULT_MAX_SECTION = 100;
 	
 	private String title ; 
 	private String description ;
 	private String exclusion;
-	private Slot [] slots;
-	private int numSlots;
+	private boolean isCC;
+	private Section [] sections;
+	private int numSection;
+	
+	/*
+	//private static final int DEFAULT_MAX_SLOT = 20;
+	private static final int DEFAULT_MAX_SECTION = 40;
+	
+	private String title ; 
+	private String description ;
+	private String exclusion;
+	private boolean isCC;
+
+	//private Slot [] slots;
+	//private int numSlots;
+
+	private Section [] sections;
+	private int numSections;
+	*/
 	
 	public Course() {
-		slots = new Slot[DEFAULT_MAX_SLOT];
-		for (int i = 0; i < DEFAULT_MAX_SLOT; i++) slots[i] = null;
-		numSlots = 0;
+		sections = new Section[DEFAULT_MAX_SECTION];
+		for (int i = 0; i < DEFAULT_MAX_SECTION; i++) sections[i] = null;
+		numSection = 0;
+		isCC = false;
 	}
 	
-	public void addSlot(Slot s) {
-		if (numSlots >= DEFAULT_MAX_SLOT)
+	public void addSection(Section s) {
+		if (numSection >= DEFAULT_MAX_SECTION) {
 			return;
-		slots[numSlots++] = s.clone();
+		}
+		sections[numSection++] = s.clone();
 	}
-	public Slot getSlot(int i) {
-		if (i >= 0 && i < numSlots)
-			return slots[i];
+	
+	public Section getSection(int i) {
+		if (i >= 0 && i < numSection) {
+			return sections[i];
+		}
 		return null;
 	}
-
+	
 	/**
 	 * @return the title
 	 */
@@ -73,16 +92,52 @@ public class Course {
 	/**
 	 * @return the numSlots
 	 */
-	public int getNumSlots() {
-		return numSlots;
+	public int getNumSections() {
+		return numSection;
 	}
 
 	/**
 	 * @param numSlots the numSlots to set
 	 */
-	public void setNumSlots(int numSlots) {
-		this.numSlots = numSlots;
+	public void setNumSections(int numSections) {
+		this.numSection = numSections;
 	}
 	
+	/**
+	 * @param flag the value of isCC to set
+	 */
+	public void setIsCC(boolean flag) {
+		this.isCC = flag;
+	}
+
+	
+	/**
+	 * @return true if this Course is 4Y CC; false if this Course is not 4Y CC
+	 */
+	public boolean isCC() {
+		return isCC;
+	}
+	
+	/**
+	 * @return true if this Course has exclusion(s); false if this Course has no exclusions
+	 */
+	public boolean hasExclusion() {
+		if (exclusion.contentEquals("null")) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	/**
+	 * @return true if this Course has labs/tutorials; false if this Coruse has no labs/tutorials
+	 */
+	public boolean hasLabTutorial() {
+		for (int i = 0; i < numSection; ++i) {
+			if ((sections[i].getSections().contains("LA")) || sections[i].getSections().contains("T")) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
