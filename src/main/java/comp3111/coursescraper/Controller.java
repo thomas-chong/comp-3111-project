@@ -27,12 +27,14 @@ import javafx.scene.paint.Color;
 
 import java.util.Random;
 import java.util.Vector;
+import java.util.Collections;
 import java.util.List;
 public class Controller {
 	Filter filter = new Filter();
 	List<Course> courseList = null;
 	List<Course> filteredCourseList = null;
-	List<Course> enrolledCourseList = new Vector<Course>();
+  List<Course> enrolledCourseList = new Vector<Course>();
+	boolean twiceClick = false;
 
     @FXML
     private Tab tabMain;
@@ -151,6 +153,46 @@ public class Controller {
     
     @FXML
     void allSubjectSearch() {
+    	int ALL_SUBJECT_COUNT = 0;
+    	int TOTAL_NUMBER_OF_COURSES = 0;
+    	
+    	List<String> subjectList = scraper.scrapeSubject(textfieldURL.getText(), textfieldTerm.getText());
+    	
+    	if (subjectList == null) {
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Error 404. Please check your input again.");
+    	}
+    	
+    	ALL_SUBJECT_COUNT = subjectList.size();
+    	
+    	textAreaConsole.setText("Total Number of Categories/Code Prefix: " + ALL_SUBJECT_COUNT + "\n\n");
+    	
+    	if (twiceClick) {
+    		Vector<Course> result = new Vector<Course>();
+	    		
+	    	int count = 0;
+	    	for (String subject : subjectList) {
+	    				
+	    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),subject);
+	    		
+	    		for (Course a : temp) {
+	    			result.add(a);
+	    		}
+	    		
+	    		System.out.println("SUBJECT is done.");
+	    		progressbar.setProgress(++count/ALL_SUBJECT_COUNT);
+	    	}
+	    	
+	    	courseList = result;
+	    	
+	    	TOTAL_NUMBER_OF_COURSES = courseList.size();
+	    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Courses fetched:  " + TOTAL_NUMBER_OF_COURSES + "\n\n");
+    	}
+    	
+    	if (!twiceClick) {
+    		twiceClick = true;
+    	}
+
+    	
     	
     }
 
@@ -160,28 +202,120 @@ public class Controller {
     }
 
     @FXML
-    void findSfqEnrollCourse() {
-
+    void findSfqEnrollCourse() {	
+    	
     }
 
     @FXML
     void search() {
+    	int NUMBER_OF_SECTIONS = 0;
+    	int NUMBER_OF_COURSES = 0;
+
     	textAreaConsole.setText("");
     	filteredCourseList = null;
     	courseList = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	
+    	if (courseList == null) {
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Error 404. Please check your input again.");
+    	}
+    	
     	for (Course c : courseList) {
     		String newline = c.getCode() + " - " + c.getTitle() + "\n";
+    		boolean courseCount = true;
+
     		int counter = 0;
     		for (int i = 0; i < c.getNumSections(); i++) {
     			Section s = c.getSection(i);
     			for (int j = 0; j < s.getNumSlots(); j++) {
     				Slot t = s.getSlot(j);
-    				newline += "Slot " + counter + ":" + t + "\n";
+    				newline += "Slot " + counter + ":" + t + "\n" + s.getSections() + " (" + s.getID() + ")\n";
     				counter++;
     			}
+    			if (!s.isValid()) {
+    				courseCount = false;
+    			}
     		}
+    		if (courseCount) {
+    			NUMBER_OF_COURSES++;
+    		}
+    		NUMBER_OF_SECTIONS += c.getNumSections();
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
+    	
+    	Vector<String> instructorList = new Vector<String>();
+    	Vector<String> uniqueInstructorList = new Vector<String>();
+    	Vector<String> blackList = new Vector<String>();
+    	
+    	for (Course c : courseList) {
+    		for (int i = 0; i < c.getNumSections(); i++) {
+    			Section s = c.getSection(i);
+    			int targetTime = 15*60 + 10;
+    			for (int j = 0; j < s.getNumSlots(); j++) {
+    				
+    				int day = s.getSlot(j).getDay();
+    				int startHour = s.getSlot(j).getStartHour();
+    				int endHour = s.getSlot(j).getEndHour();
+    				int startMinute = s.getSlot(j).getStartMinute();
+    				int endMinute = s.getSlot(j).getEndMinute();
+    				
+    				
+    				for (int k = 0; k < s.getNumInstructors(); k++) {
+    					String name = s.getInstructor(k).getLastName() + ", " + s.getInstructor(k).getFirstName();
+    					instructorList.add(name);
+					}
+    			}
+    		}
+    	}
+    	
+    	for (String a : instructorList) {
+    		String temp = a;
+    		temp = temp.trim();
+    		if (!uniqueInstructorList.contains(temp) && !temp.equals("null, null")) {
+    			uniqueInstructorList.add(temp);
+    		}
+    	}
+    	
+    	for (Course c : courseList) {
+    		for (int i = 0; i < c.getNumSections(); i++) {
+    			Section s = c.getSection(i);
+    			int targetTime = 15*60 + 10;
+    			for (int j = 0; j < s.getNumSlots(); j++) {
+    				int day = s.getSlot(j).getDay();
+    				int startHour = s.getSlot(j).getStartHour();
+    				int endHour = s.getSlot(j).getEndHour();
+    				int startMinute = s.getSlot(j).getStartMinute();
+    				int endMinute = s.getSlot(j).getEndMinute();
+    				
+    				if (day == 1 && (startHour * 60 + startMinute) <= targetTime && (endHour * 60 + endMinute) >= targetTime) {
+    					for (int k = 0; k < s.getNumInstructors(); k++) {
+    						String name = s.getInstructor(k).getLastName() + ", " + s.getInstructor(k).getFirstName();
+    						name = name.trim();
+        					if (!blackList.contains(name)) {
+        						blackList.add(name);
+        					}			
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+    	Collections.sort(uniqueInstructorList);
+    	
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of difference sections in this search: " + NUMBER_OF_SECTIONS);
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of Course in this search: " + NUMBER_OF_COURSES);
+    	
+    	String output = "";
+    	for (String a : uniqueInstructorList) {
+    		if (!blackList.contains(a)) {
+    			output += a + ", \n";
+    		}
+    		else {
+    			System.out.println(a);
+    		}
+    		
+    	}
+	
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Display Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: "+ "\n" + output);
     	
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();

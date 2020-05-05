@@ -55,7 +55,7 @@ public class Course {
 		c.isCC = this.isCC;
 		return c;
 	}
-	
+
 	public void addSection(Section s) {
 		if (numSection >= DEFAULT_MAX_SECTION) {
 			return;
