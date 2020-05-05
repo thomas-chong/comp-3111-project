@@ -26,6 +26,8 @@ public class Filter {
 	 * @return result the list of filtered courses
 	 */
 	public List<Course> getFilteredCourseList(List<Course> courseList) {
+		if (courseList == null) return null;
+		
 		Vector<Course> result = new Vector<Course>();
 		for (Course c : courseList) {
 			Vector<Section> matches = new Vector<Section>();
@@ -48,10 +50,7 @@ public class Filter {
 				}
 			}
 			if (!matches.isEmpty()) {
-				Course t = new Course();
-				t.setTitle(c.getTitle());
-				t.setExclusion(c.getExclusion());
-				t.setIsCC(c.isCC());
+				Course t = c.cloneWithoutSections();
 				for (int j = 0; j < matches.size(); ++j) {
 					t.addSection(matches.get(j));
 				}

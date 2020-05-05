@@ -1,6 +1,11 @@
 package comp3111.coursescraper;
 
 import java.awt.event.ActionEvent;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -8,7 +13,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -23,8 +31,9 @@ import java.util.Collections;
 import java.util.List;
 public class Controller {
 	Filter filter = new Filter();
-	List<Course> courseList;
-	List<Course> filteredCourseList;
+	List<Course> courseList = null;
+	List<Course> filteredCourseList = null;
+  List<Course> enrolledCourseList = new Vector<Course>();
 	boolean twiceClick = false;
 
     @FXML
@@ -93,11 +102,32 @@ public class Controller {
 
     /*	=== === === === === === === === === === === === === === === === 
      * 		UI Elements for List Tab
-     * === === === === === === === === === === === === === === === === 
+     * 	=== === === === === === === === === === === === === === === === 
      */
     @FXML
     private Tab tabList;
+    
+    @FXML
+    private TableView<ListItem> sectionTable;
+    
+    @FXML
+    private ObservableList<ListItem> sectionTableData;
+    
+    @FXML
+    private TableColumn<ListItem, String> courseCodeCol;
+    
+    @FXML
+    private TableColumn<ListItem, String> sectionCol;
 
+    @FXML
+    private TableColumn<ListItem, String> courseNameCol;
+
+    @FXML
+    private TableColumn<ListItem, String> instructorCol;
+
+    @FXML
+    private TableColumn<ListItem, String> enrollCol;
+    
     @FXML
     private Tab tabTimetable;
 
@@ -180,7 +210,9 @@ public class Controller {
     void search() {
     	int NUMBER_OF_SECTIONS = 0;
     	int NUMBER_OF_COURSES = 0;
-    	
+
+    	textAreaConsole.setText("");
+    	filteredCourseList = null;
     	courseList = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	
     	if (courseList == null) {
@@ -188,8 +220,9 @@ public class Controller {
     	}
     	
     	for (Course c : courseList) {
-    		String newline = c.getTitle() + "\n";
+    		String newline = c.getCode() + " - " + c.getTitle() + "\n";
     		boolean courseCount = true;
+
     		int counter = 0;
     		for (int i = 0; i < c.getNumSections(); i++) {
     			Section s = c.getSection(i);
@@ -305,32 +338,38 @@ public class Controller {
      * 		Actions for Filter Tab
      * === === === === === === === === === === === === === === === === 
      */
-    void printConsole(List<Course> courseList) {
-    	textAreaConsole.setText("");
+    void filterPrintConsole(List<Course> courseList) {
+    	textAreaConsole.setText(textAreaConsole.getText() + "Displaying filtered courses:\n");
+    	if (courseList == null) return;
+    	
     	for (Course c : courseList) {
-    		String newline = c.getTitle() + "\n";
-    		for (int i = 0; i < c.getNumSections(); i++) {
-    			int counter = 0;
-    			Section s = c.getSection(i);
-    			newline += "\tSection " + s.getSections() + "\tInstructor: ";
-    			for (int j = 0; j < s.getNumInstructors(); ++j) {
-    				if (s.getInstructor(j).getLastName().contentEquals("null")) {
-    					newline += "TBA";
-    				} else {
-    					newline += s.getInstructor(j).getLastName() + ", " + s.getInstructor(j).getFirstName();
-    				}
-    				if (j + 1 != s.getNumInstructors()) {
-    					newline += ", ";
-    				}
-    			}
-    			newline += "\n";
-    			for (int j = 0; j < s.getNumSlots(); j++) {
-    				Slot t = s.getSlot(j);
-    				newline += "\t\tSlot " + counter + "\t" + t + "\n";
-    				counter++;
-    			}
+    		if (c.getNumValidSection() > 0) {
+	    		String newline = c.getCode() + " - " + c.getTitle() + "\n";
+	    		for (int i = 0; i < c.getNumSections(); i++) {
+	    			int counter = 1;
+	    			Section s = c.getSection(i);
+	    			if (s.isValid()) {
+		    			newline += "\tSection " + s.getSections() + " (" + s.getID() + ")\t\tInstructor: ";
+		    			for (int j = 0; j < s.getNumInstructors(); ++j) {
+		    				if (s.getInstructor(j).getLastName().contentEquals("null")) {
+		    					newline += "TBA";
+		    				} else {
+		    					newline += s.getInstructor(j).getLastName() + ", " + s.getInstructor(j).getFirstName();
+		    				}
+		    				if (j + 1 != s.getNumInstructors()) {
+		    					newline += ", ";
+		    				}
+		    			}
+		    			newline += "\n";
+	    			}
+	    			for (int j = 0; j < s.getNumSlots(); j++) {
+	    				Slot t = s.getSlot(j);
+	    				newline += "\t\tSlot " + counter + "\t" + t + "\n";
+	    				counter++;
+	    			}
+	    		} 	
+	    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     		}
-    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     }
     
@@ -380,77 +419,201 @@ public class Controller {
     void checkboxAMChecked() {
     	filter.setFilter(filterType.AM, checkboxAM.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxCCChecked() {
     	filter.setFilter(filterType.CC, checkboxCC.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxFriChecked() {
     	filter.setFilter(filterType.FRI, checkboxFri.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxLabTutorialChecked() {
     	filter.setFilter(filterType.LAB_TUTORIAL, checkboxLabTutorial.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxMonChecked() {
     	filter.setFilter(filterType.MON, checkboxMon.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxNoExclusionChecked() {
     	filter.setFilter(filterType.NO_EXCLUSION, checkboxNoExclusion.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxPMChecked() {
     	filter.setFilter(filterType.PM, checkboxPM.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxSatChecked() {
     	filter.setFilter(filterType.SAT, checkboxSat.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxThuChecked() {
     	filter.setFilter(filterType.THU, checkboxThu.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxTueChecked() {
     	filter.setFilter(filterType.TUE, checkboxTue.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
 
     @FXML
     void checkboxWedChecked() {
     	filter.setFilter(filterType.WED, checkboxWed.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
-    	printConsole(filteredCourseList);
+    	textAreaConsole.setText("");
+    	filterPrintConsole(filteredCourseList);
     }
-
+    
+    /*	=== === === === === === === === === === === === === === === === 
+     * 		Actions for List Tab
+     * === === === === === === === === === === === === === === === === 
+     */
+    void listPrintConsole(List<Course> courseList) {
+    	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:\n");
+    	if (courseList == null) return;
+    	
+    	for (Course c : courseList) {
+    		if (c.getNumValidSection() > 0) {
+	    		String newline = c.getCode() + " - " + c.getTitle() + "\n";
+	    		for (int i = 0; i < c.getNumSections(); i++) {
+	    			int counter = 1;
+	    			Section s = c.getSection(i);
+	    			if (s.isValid()) {
+	    				newline += "\tSection " + s.getSections() + " (" + s.getID() + ")\t\tInstructor: ";
+		    			for (int j = 0; j < s.getNumInstructors(); ++j) {
+		    				if (s.getInstructor(j).getLastName().contentEquals("null")) {
+		    					newline += "TBA";
+		    				} else {
+		    					newline += s.getInstructor(j).getLastName() + ", " + s.getInstructor(j).getFirstName();
+		    				}
+		    				if (j + 1 != s.getNumInstructors()) {
+		    					newline += ", ";
+		    				}
+		    			}
+		    			newline += "\n";
+	    			}
+	    			for (int j = 0; j < s.getNumSlots(); j++) {
+	    				Slot t = s.getSlot(j);
+	    				newline += "\t\tSlot " + counter + "\t" + t + "\n";
+	    				counter++;
+	    			}
+	    		} 	
+	    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    		}
+    	}
+    }
+    
+    @FXML
+    void tabListSelected() {
+    	// Initialization
+    	sectionTableData = FXCollections.observableArrayList();
+    	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	
+    	// Set up column factories
+    	courseCodeCol.setCellValueFactory(new PropertyValueFactory<ListItem, String>("code"));
+    	sectionCol.setCellValueFactory(new PropertyValueFactory<ListItem, String>("sectionName"));
+    	courseNameCol.setCellValueFactory(new PropertyValueFactory<ListItem, String>("courseName"));
+    	instructorCol.setCellValueFactory(new PropertyValueFactory<ListItem, String>("instructorName"));
+    	enrollCol.setCellValueFactory(new PropertyValueFactory<ListItem, String>("isEnrolled"));
+    	
+    	// Select list to be displayed - scraped list by default
+    	List<Course> displayList = null;
+    	if (filteredCourseList != null) {
+    		displayList = filteredCourseList;
+    	} else if (courseList != null) {
+    		displayList = courseList;
+    	}
+    	
+    	if (displayList != null) {
+	    	for (Course c : displayList) {
+	    		for (int i = 0; i < c.getNumSections(); ++i) {
+	    			
+	    			// Add row
+	    			Section s = c.getSection(i);
+	    			if (!s.isValid()) {
+	    				continue;
+	    			}
+	    			boolean flag = false;
+	    			// Check in enrolledCourseList if Section is enrolled
+	    			for (int j = 0; j < enrolledCourseList.size(); ++j) {
+	    				Course enrollCourse = enrolledCourseList.get(j);
+	    				if (enrollCourse.getSection(0).getID().contentEquals(s.getID())) {
+	    					flag = true;
+	    				}
+	    			}		
+	    			ListItem t = new ListItem(c, c.getSection(i), flag);
+	    			sectionTableData.add(t);
+	    			
+	    			// Checkbox listener for enrollment
+	    			t.getIsEnrolled().selectedProperty().addListener(new ChangeListener<Boolean>() {
+	    				public void changed(ObservableValue ov, Boolean old_value, Boolean new_value) {
+	    					// Enroll course into enrolledCourseList
+	    					if (t.getIsEnrolled().isSelected()) {
+	    						Course enrollCourse = c.cloneWithoutSections();
+	    						enrollCourse.addSection(s);
+	    						enrolledCourseList.add(enrollCourse);
+	    					
+	    					// Withdraw course from enrolledCourseList
+	    					} else {	
+	    						for (int k = 0; k < enrolledCourseList.size(); ++k) {
+	    							Course withdrawCourse = enrolledCourseList.get(k);
+	    							if (withdrawCourse.getSection(0).getID().contentEquals(s.getID())) {
+	    								enrolledCourseList.remove(k);
+	    								break;
+	    							}
+	    						}
+	    					}
+	    					
+	    					// Print enrollment statuses
+	    					textAreaConsole.setText("");
+	    					listPrintConsole(enrolledCourseList);
+	    					textAreaConsole.setText(textAreaConsole.getText() + "\n\n\n");
+	    					filterPrintConsole(filteredCourseList);
+	    				}
+	    			});
+	    		}
+	    	}
+    	}
+    	sectionTable.setItems(sectionTableData);
+    }
 }
+
