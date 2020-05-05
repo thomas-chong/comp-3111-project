@@ -23,6 +23,7 @@ public class Controller {
 	Filter filter = new Filter();
 	List<Course> courseList;
 	List<Course> filteredCourseList;
+	List<SFQ> sfqList;
 
     @FXML
     private Tab tabMain;
@@ -119,8 +120,13 @@ public class Controller {
     private Scraper scraper = new Scraper();
     
     @FXML
+    void initialize() {
+    	buttonSfqEnrollCourse.setDisable(true);
+    }
+    
+    @FXML
     void allSubjectSearch() {
-    	
+    	buttonSfqEnrollCourse.setDisable(false);
     }
 
     @FXML
@@ -130,7 +136,15 @@ public class Controller {
 
     @FXML
     void findSfqEnrollCourse() {
-
+    	List<SFQ> sfqList = scraper.scrapeSFQ(textfieldSfqUrl.getText());
+    	List<SFQ> sfqEnrolled;
+    	/* Awaiting enrolledCourseList completion  **
+    	for (SFQ s: sfqList) {
+    		for (Course c: enrolledCourseList)
+    			if (s.getTitle().equalsIgnoreCase(c.getTitle()))
+    				sfqEnrolled.add(s);
+    	} */
+    	printSFQConsole(sfqList);
     }
 
     @FXML
@@ -165,6 +179,8 @@ public class Controller {
     	randomLabel.setMaxHeight(60);
     
     	ap.getChildren().addAll(randomLabel);
+    	
+    	buttonSfqEnrollCourse.setDisable(false);   // For Task 6: SFQ
     }
   
     /*	=== === === === === === === === === === === === === === === === 
@@ -199,6 +215,16 @@ public class Controller {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     }
+    
+    /* printConsole function for SFQ only */
+    void printSFQConsole(List<SFQ> sfqList) {
+    	textAreaConsole.setText("");
+    	for (SFQ s : sfqList) {
+    		String newline = s.getTitle() + "\t\t" + s.getSFQ();
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	}
+    }
+    
     
     @FXML
     void buttonSelectAllPressed() {

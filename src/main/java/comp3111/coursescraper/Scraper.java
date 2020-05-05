@@ -180,5 +180,58 @@ public class Scraper {
 		}
 		return null;
 	}
+	
+	public List<SFQ> scrapeSFQ(String sfqurl) {
+		try {
+			// HtmlPage page = client.getPage(sfqurl);
+			HtmlPage page = client.getPage("file:///C:/Users/User/git/comp-3111-project/src/main/resources/eng-f19.html");
+			List<?> dept = page.getByXPath("//table[2]/tbody/tr/td[1]");
+			Vector<SFQ> result = new Vector<SFQ>();
+			List<?> tables = (List<?>) page.getByXPath("//table");
+			
+			for (int i=2; i <= dept.size(); i++) {
+				HtmlElement table = (HtmlElement) tables.get(i);
+				List<?> rows = (List<?>) table.getByXPath(".//tr");
+				SFQ s = new SFQ();
+				double totalsfq = 0;
+				int secCount = 0;
+				for (int j=1; j < rows.size(); j++) {
+					HtmlElement row = (HtmlElement) rows.get(j);
+					//System.out.println(row.asText());
+					//System.out.println("========");
+					HtmlElement title = (HtmlElement) row.getByXPath(".//td").get(1);
+					System.out.println(title.asText());
+					HtmlElement section = (HtmlElement) row.getByXPath(".//td").get(2);
+					if (title.getAttribute("colspan").contains("3")) {
+						if (j != 1) {
+							totalsfq /= secCount;						
+							s.setSFQ(totalsfq);
+							System.out.println(totalsfq);
+							result.add(s);
+							s.clear();
+							totalsfq = 0;
+							secCount = 0;
+						}
+						s.setTitle(title.asText().trim());
+						System.out.print(title.asText().trim() + "\t");
+						continue;
+						
+					}
+					if (section.asText().contains("L") || section.asText().contains("T")) {
+						secCount++;
+						HtmlElement score = (HtmlElement) row.getByXPath(".//td").get(4);
+						String scores[] = score.asText().split("\\(");
+						if (!scores[0].equals("-"))	
+							totalsfq += Double.parseDouble(scores[0]);
+					}
+				}
+			}
+			return result;	
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
 
 }
