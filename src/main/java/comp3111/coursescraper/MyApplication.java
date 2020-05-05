@@ -12,8 +12,6 @@ import javafx.scene.Scene;
 
 
 /**
- * @author kevinw
- * 
  * The entry point of the entire program. It is quite unlikely you need to change this file. But you can change it if you want :)
  * 
  * GUI

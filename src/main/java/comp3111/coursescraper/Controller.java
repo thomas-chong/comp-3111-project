@@ -28,6 +28,13 @@ import javafx.scene.paint.Color;
 import java.util.Random;
 import java.util.Vector;
 import java.util.List;
+
+/**
+ * Placeholder
+ * @author
+ *
+ */
+
 public class Controller {
 	Filter filter = new Filter();
 	List<Course> courseList = null;
@@ -204,6 +211,11 @@ public class Controller {
      * 		Actions for Filter Tab
      * === === === === === === === === === === === === === === === === 
      */
+    
+    /**
+     * Prints filtered course informations on the console. The filtered course information includes course code, course title, section code, section-ID, section instructors and slot information.
+     * @param courseList the List of Courses to be printed
+     */
     void filterPrintConsole(List<Course> courseList) {
     	textAreaConsole.setText(textAreaConsole.getText() + "Displaying filtered courses:\n");
     	if (courseList == null) return;
@@ -239,6 +251,13 @@ public class Controller {
     	}
     }
     
+    /**
+     * Fires when the button "Select All" or "De-select All" is pressed. When "Select All" is pressed, all checkboxes in the Filter tab are checked, and the button becomes "De-select All".
+     * <br><br>
+     * When "De-select All" is pressed, all checkboxes in the Filter tab are unchecked, and the button becomes "Select All".
+     * <br><br>
+     * Either way, this method fires the onSelect() method of all checkboxes at last in the Filter tab.
+     */
     @FXML
     void buttonSelectAllPressed() {
     	if (buttonSelectAll.getText().contentEquals("Select All")) {
@@ -280,7 +299,10 @@ public class Controller {
     	checkboxLabTutorialChecked();
     	checkboxNoExclusionChecked();
     }
-
+    
+    /**
+     * Fires when the checkbox "AM" is checked/unchecked. It applies/unapplies the "AM" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxAMChecked() {
     	filter.setFilter(filterType.AM, checkboxAM.isSelected());
@@ -288,7 +310,10 @@ public class Controller {
     	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
-
+    
+    /**
+     * Fires when the checkbox "CC" is checked/unchecked. It applies/unapplies the "CC" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxCCChecked() {
     	filter.setFilter(filterType.CC, checkboxCC.isSelected());
@@ -296,7 +321,10 @@ public class Controller {
     	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
-
+    
+    /**
+     * Fires when the checkbox "FRI" is checked/unchecked. It applies/unapplies the "FRI" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxFriChecked() {
     	filter.setFilter(filterType.FRI, checkboxFri.isSelected());
@@ -305,6 +333,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "LAB_TUTORIAL" is checked/unchecked. It applies/unapplies the "LAB_TUTORIAL" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxLabTutorialChecked() {
     	filter.setFilter(filterType.LAB_TUTORIAL, checkboxLabTutorial.isSelected());
@@ -313,6 +344,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "MON" is checked/unchecked. It applies/unapplies the "MON" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxMonChecked() {
     	filter.setFilter(filterType.MON, checkboxMon.isSelected());
@@ -321,6 +355,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "NO_EXCLUSION" is checked/unchecked. It applies/unapplies the "NO_EXCLUSION" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxNoExclusionChecked() {
     	filter.setFilter(filterType.NO_EXCLUSION, checkboxNoExclusion.isSelected());
@@ -329,6 +366,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "PM" is checked/unchecked. It applies/unapplies the "PM" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxPMChecked() {
     	filter.setFilter(filterType.PM, checkboxPM.isSelected());
@@ -337,6 +377,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "SAT" is checked/unchecked. It applies/unapplies the "SAT" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxSatChecked() {
     	filter.setFilter(filterType.SAT, checkboxSat.isSelected());
@@ -345,6 +388,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "THU" is checked/unchecked. It applies/unapplies the "THU" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxThuChecked() {
     	filter.setFilter(filterType.THU, checkboxThu.isSelected());
@@ -353,6 +399,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "TUE" is checked/unchecked. It applies/unapplies the "TUE" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxTueChecked() {
     	filter.setFilter(filterType.TUE, checkboxTue.isSelected());
@@ -361,6 +410,9 @@ public class Controller {
     	filterPrintConsole(filteredCourseList);
     }
 
+    /**
+     * Fires when the checkbox "WED" is checked/unchecked. It applies/unapplies the "WED" filter to <em>courseList</em>, recalculates the <em>filteredCourseList</em>, then prints the filtered information to the console.
+     */
     @FXML
     void checkboxWedChecked() {
     	filter.setFilter(filterType.WED, checkboxWed.isSelected());
@@ -372,6 +424,10 @@ public class Controller {
     /*	=== === === === === === === === === === === === === === === === 
      * 		Actions for List Tab
      * === === === === === === === === === === === === === === === === 
+     */
+    /**
+     * Prints enrolled course informations on the console. The enrolled course information includes course code, course title, section code, section-ID, section instructors and slot information. Unlike filtered course information, each Section and each Course are printed in an "one-to-one" format.
+     * @param courseList the List of Courses to be printed
      */
     void listPrintConsole(List<Course> courseList) {
     	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:\n");
