@@ -48,6 +48,16 @@ public class Course {
 		return c;
 	}
 	
+	public Course cloneWithoutSections() {
+		Course c = new Course();
+		c.title = this.title;
+		c.code = this.code;
+		c.description = this.description;
+		c.exclusion = this.exclusion;
+		c.isCC = this.isCC;
+		return c;
+	}
+	
 	public void addSection(Section s) {
 		if (numSection >= DEFAULT_MAX_SECTION) {
 			return;
