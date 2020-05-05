@@ -205,17 +205,17 @@ public class Controller {
      * === === === === === === === === === === === === === === === === 
      */
     void filterPrintConsole(List<Course> courseList) {
-    	textAreaConsole.setText("");
+    	textAreaConsole.setText(textAreaConsole.getText() + "Displaying filtered courses:\n");
     	if (courseList == null) return;
     	
     	for (Course c : courseList) {
     		if (c.getNumValidSection() > 0) {
 	    		String newline = c.getCode() + " - " + c.getTitle() + "\n";
 	    		for (int i = 0; i < c.getNumSections(); i++) {
-	    			int counter = 0;
+	    			int counter = 1;
 	    			Section s = c.getSection(i);
 	    			if (s.isValid()) {
-		    			newline += "\tSection " + s.getSections() + "\tInstructor: ";
+		    			newline += "\tSection " + s.getSections() + " (" + s.getID() + ")\t\tInstructor: ";
 		    			for (int j = 0; j < s.getNumInstructors(); ++j) {
 		    				if (s.getInstructor(j).getLastName().contentEquals("null")) {
 		    					newline += "TBA";
@@ -285,6 +285,7 @@ public class Controller {
     void checkboxAMChecked() {
     	filter.setFilter(filterType.AM, checkboxAM.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -292,6 +293,7 @@ public class Controller {
     void checkboxCCChecked() {
     	filter.setFilter(filterType.CC, checkboxCC.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -299,6 +301,7 @@ public class Controller {
     void checkboxFriChecked() {
     	filter.setFilter(filterType.FRI, checkboxFri.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -306,6 +309,7 @@ public class Controller {
     void checkboxLabTutorialChecked() {
     	filter.setFilter(filterType.LAB_TUTORIAL, checkboxLabTutorial.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -313,6 +317,7 @@ public class Controller {
     void checkboxMonChecked() {
     	filter.setFilter(filterType.MON, checkboxMon.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -320,6 +325,7 @@ public class Controller {
     void checkboxNoExclusionChecked() {
     	filter.setFilter(filterType.NO_EXCLUSION, checkboxNoExclusion.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -327,6 +333,7 @@ public class Controller {
     void checkboxPMChecked() {
     	filter.setFilter(filterType.PM, checkboxPM.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -334,6 +341,7 @@ public class Controller {
     void checkboxSatChecked() {
     	filter.setFilter(filterType.SAT, checkboxSat.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -341,6 +349,7 @@ public class Controller {
     void checkboxThuChecked() {
     	filter.setFilter(filterType.THU, checkboxThu.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -348,6 +357,7 @@ public class Controller {
     void checkboxTueChecked() {
     	filter.setFilter(filterType.TUE, checkboxTue.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
 
@@ -355,6 +365,7 @@ public class Controller {
     void checkboxWedChecked() {
     	filter.setFilter(filterType.WED, checkboxWed.isSelected());
     	filteredCourseList = filter.getFilteredCourseList(courseList);
+    	textAreaConsole.setText("");
     	filterPrintConsole(filteredCourseList);
     }
     
@@ -362,10 +373,46 @@ public class Controller {
      * 		Actions for List Tab
      * === === === === === === === === === === === === === === === === 
      */
+    void listPrintConsole(List<Course> courseList) {
+    	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:\n");
+    	if (courseList == null) return;
+    	
+    	for (Course c : courseList) {
+    		if (c.getNumValidSection() > 0) {
+	    		String newline = c.getCode() + " - " + c.getTitle() + "\n";
+	    		for (int i = 0; i < c.getNumSections(); i++) {
+	    			int counter = 1;
+	    			Section s = c.getSection(i);
+	    			if (s.isValid()) {
+	    				newline += "\tSection " + s.getSections() + " (" + s.getID() + ")\t\tInstructor: ";
+		    			for (int j = 0; j < s.getNumInstructors(); ++j) {
+		    				if (s.getInstructor(j).getLastName().contentEquals("null")) {
+		    					newline += "TBA";
+		    				} else {
+		    					newline += s.getInstructor(j).getLastName() + ", " + s.getInstructor(j).getFirstName();
+		    				}
+		    				if (j + 1 != s.getNumInstructors()) {
+		    					newline += ", ";
+		    				}
+		    			}
+		    			newline += "\n";
+	    			}
+	    			for (int j = 0; j < s.getNumSlots(); j++) {
+	    				Slot t = s.getSlot(j);
+	    				newline += "\t\tSlot " + counter + "\t" + t + "\n";
+	    				counter++;
+	    			}
+	    		} 	
+	    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    		}
+    	}
+    }
+    
     @FXML
     void tabListSelected() {
     	// Initialization
     	sectionTableData = FXCollections.observableArrayList();
+    	filteredCourseList = filter.getFilteredCourseList(courseList);
     	
     	// Set up column factories
     	courseCodeCol.setCellValueFactory(new PropertyValueFactory<ListItem, String>("code"));
@@ -421,6 +468,12 @@ public class Controller {
 	    							}
 	    						}
 	    					}
+	    					
+	    					// Print enrollment statuses
+	    					textAreaConsole.setText("");
+	    					listPrintConsole(enrolledCourseList);
+	    					textAreaConsole.setText(textAreaConsole.getText() + "\n\n\n");
+	    					filterPrintConsole(filteredCourseList);
 	    				}
 	    			});
 	    		}
