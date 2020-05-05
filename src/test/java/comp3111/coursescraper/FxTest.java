@@ -3,7 +3,6 @@
  * You might want to uncomment the following code to learn testFX. Sorry, no tutorial session on this.
  * 
  */
-/*
 package comp3111.coursescraper;
 
 import static org.junit.Assert.*;
@@ -46,4 +45,3 @@ public class FxTest extends ApplicationTest {
 		assertTrue(b.isDisabled());
 	}
 }
-*/
