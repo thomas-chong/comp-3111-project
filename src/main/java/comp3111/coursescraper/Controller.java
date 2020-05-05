@@ -131,7 +131,8 @@ public class Controller {
 
     @FXML
     void findInstructorSfq() {
-    	buttonInstructorSfq.setDisable(true);
+    	List<SFQ> sfqList = scraper.scrapeInstructorSFQ(textfieldSfqUrl.getText());
+    	printSFQConsole(sfqList, true);
     }
 
     @FXML
@@ -143,8 +144,10 @@ public class Controller {
     		for (Course c: enrolledCourseList)
     			if (s.getTitle().equalsIgnoreCase(c.getTitle()))
     				sfqEnrolled.add(s);
-    	} */
-    	printSFQConsole(sfqList);
+    	} 
+    	printSFQConsole(sfqEnrolled);
+    	*/
+    	printSFQConsole(sfqList, false);
     }
 
     @FXML
@@ -217,10 +220,17 @@ public class Controller {
     }
     
     /* printConsole function for SFQ only */
-    void printSFQConsole(List<SFQ> sfqList) {
+    void printSFQConsole(List<SFQ> sfqList, boolean instructor) {
     	textAreaConsole.setText("");
     	for (SFQ s : sfqList) {
-    		String newline = s.getTitle() + "\t\t" + s.getSFQ();
+    		String newline = (instructor?s.getInstructor():s.getTitle()) + "\t\t" + s.getSFQ();
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	}
+    }
+    void printInstructorSFQ(List<SFQ> sfqList) {
+    	textAreaConsole.setText("");
+    	for (SFQ s: sfqList) {
+    		String newline = s.getInstructor() + "\t\t" + s.getSFQ();
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     }

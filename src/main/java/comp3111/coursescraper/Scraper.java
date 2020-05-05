@@ -197,29 +197,25 @@ public class Scraper {
 				int secCount = 0;
 				for (int j=1; j < rows.size(); j++) {
 					HtmlElement row = (HtmlElement) rows.get(j);
-					//System.out.println(row.asText());
-					//System.out.println("========");
-					HtmlElement title = (HtmlElement) row.getByXPath(".//td").get(1);
-					System.out.println(title.asText());
-					HtmlElement section = (HtmlElement) row.getByXPath(".//td").get(2);
+					HtmlElement title = (HtmlElement) row.getByXPath(".//td").get(0);
+					HtmlElement section = (HtmlElement) row.getByXPath(".//td").get(1);
 					if (title.getAttribute("colspan").contains("3")) {
 						if (j != 1) {
 							totalsfq /= secCount;						
 							s.setSFQ(totalsfq);
-							System.out.println(totalsfq);
-							result.add(s);
+							result.add(new SFQ(s.getTitle(),s.getInstructor(),s.getSFQ()));
 							s.clear();
 							totalsfq = 0;
 							secCount = 0;
 						}
-						s.setTitle(title.asText().trim());
-						System.out.print(title.asText().trim() + "\t");
+						if (!title.asText().contains("Overall")) 
+							s.setTitle(title.asText().trim());				
 						continue;
 						
 					}
 					if (section.asText().contains("L") || section.asText().contains("T")) {
 						secCount++;
-						HtmlElement score = (HtmlElement) row.getByXPath(".//td").get(4);
+						HtmlElement score = (HtmlElement) row.getByXPath(".//td").get(3);
 						String scores[] = score.asText().split("\\(");
 						if (!scores[0].equals("-"))	
 							totalsfq += Double.parseDouble(scores[0]);
@@ -227,7 +223,58 @@ public class Scraper {
 				}
 			}
 			return result;	
-			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	
+	public List<SFQ> scrapeInstructorSFQ(String sfqurl) {
+		try {
+			// HtmlPage page = client.getPage(sfqurl);
+			HtmlPage page = client.getPage("file:///C:/Users/User/git/comp-3111-project/src/main/resources/eng-f19.html");
+			List<?> dept = page.getByXPath("//table[2]/tbody/tr/td[1]");
+			Vector<SFQ> result = new Vector<SFQ>();
+			List<?> tables = (List<?>) page.getByXPath("//table");
+			for (int i=2; i <= dept.size(); i++) {
+				HtmlElement table = (HtmlElement) tables.get(i);
+				List<?> rows = (List<?>) table.getByXPath(".//tr");
+				SFQ s = new SFQ();
+				for (int j=1; j < rows.size(); j++) {
+					HtmlElement row = (HtmlElement) rows.get(j);
+					HtmlElement title = (HtmlElement) row.getByXPath(".//td").get(0); 
+					HtmlElement instructor = (HtmlElement) row.getByXPath(".//td").get(2);
+					if (title.getAttribute("colspan").contains("3") || instructor.asText().length() <= 2)
+						continue;
+					String name = instructor.asText().trim();
+					name = name.replaceAll("\\p{C}", "");
+					s.setInstructor(instructor.asText().trim());
+					HtmlElement score = (HtmlElement) row.getByXPath(".//td").get(3);
+					String scores[] = score.asText().split("\\(");
+					if (!scores[0].equals("-"))	
+						s.setSFQ(Double.parseDouble(scores[0]));
+					result.add(new SFQ(s.getTitle(),s.getInstructor(),s.getSFQ()));
+					s.clear();				
+				}
+			} 
+			for (int i=0; i < result.size(); i++) {   // Find duplicates and calculate average
+				int count = 1;
+				String name = result.get(i).getInstructor();
+				double totalsfq = result.get(i).getSFQ();
+				System.out.println("A: " + name);
+				for (int j = i+1; j < result.size(); j++) {
+					System.out.println("\t" + result.get(j).getInstructor());
+					if (result.get(j).getInstructor().contains(name) ||
+							name.contains(result.get(j).getInstructor())) {
+						count++;
+						totalsfq += result.get(j).getSFQ();
+						result.remove(j--);
+					}		
+				}
+				if (count > 1)
+					result.get(i).setSFQ(totalsfq/count);
+			} 
+			return result;
 		} catch (Exception e) {
 			System.out.println(e);
 		}
