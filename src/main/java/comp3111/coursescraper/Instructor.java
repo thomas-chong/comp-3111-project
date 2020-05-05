@@ -4,7 +4,7 @@ public class Instructor {
 	private String firstName;
 	private String lastName;
 	
-	public Instructor() {
+	void Instructor() {
 		firstName = "";
 		lastName = "";
 	}
@@ -12,13 +12,6 @@ public class Instructor {
 	public void setInstructor(String firstName, String lastName) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-	}
-	
-	public Instructor clone() {
-		Instructor in = new Instructor();
-		in.firstName = this.firstName;
-		in.lastName = this.lastName;
-		return in;
 	}
 	
 	public String getFirstName() {
