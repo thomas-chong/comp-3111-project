@@ -4,6 +4,7 @@ public class Course {
 	private static final int DEFAULT_MAX_SECTION = 100;
 	
 	private String title ; 
+	private String code;
 	private String description ;
 	private String exclusion;
 	private boolean isCC;
@@ -33,6 +34,20 @@ public class Course {
 		isCC = false;
 	}
 	
+	public Course clone() {
+		Course c = new Course();
+		c.title = this.title;
+		c.code = this.code;
+		c.description = this.description;
+		c.exclusion = this.exclusion;
+		c.isCC = this.isCC;
+		c.numSection = this.numSection;
+		for (int i = 0; i < numSection; ++i) {
+			c.sections[i] = this.sections[i].clone();
+		}
+		return c;
+	}
+	
 	public void addSection(Section s) {
 		if (numSection >= DEFAULT_MAX_SECTION) {
 			return;
@@ -43,6 +58,15 @@ public class Course {
 	public Section getSection(int i) {
 		if (i >= 0 && i < numSection) {
 			return sections[i];
+		}
+		return null;
+	}
+	
+	public Section getSection(String id) {
+		for (int i = 0; i < getNumSections(); ++i) {
+			if (sections[i].getID().contentEquals(id)) {
+				return sections[i];
+			}
 		}
 		return null;
 	}
@@ -59,6 +83,20 @@ public class Course {
 	 */
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	/**
+	 * @return the code
+	 */
+	public String getCode() {
+		return code;
+	}
+	
+	/**
+	 * @param code the code to set
+	 */
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	/**
@@ -128,6 +166,7 @@ public class Course {
 			return true;
 		}
 	}
+	
 	/**
 	 * @return true if this Course has labs/tutorials; false if this Coruse has no labs/tutorials
 	 */
@@ -138,6 +177,16 @@ public class Course {
 			}
 		}
 		return false;
+	}
+	
+	public int getNumValidSection() {
+		int invalid_count = 0;
+		for (int i = 0; i < numSection; ++i) {
+			if (!sections[i].isValid()) {
+				invalid_count++;
+			}
+		}
+		return numSection - invalid_count;
 	}
 
 }
