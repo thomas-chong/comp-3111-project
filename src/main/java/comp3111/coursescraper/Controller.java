@@ -309,9 +309,9 @@ public class Controller {
     		if (!blackList.contains(a)) {
     			output += a + ", \n";
     		}
-    		else {
-    			System.out.println(a);
-    		}
+    		//else {
+    			//System.out.println(a);
+    		//}
     		
     	}
 	
