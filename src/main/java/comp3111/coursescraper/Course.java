@@ -26,10 +26,8 @@ public class Course {
 	private String description ;
 	private String exclusion;
 	private boolean isCC;
-
 	//private Slot [] slots;
 	//private int numSlots;
-
 	private Section [] sections;
 	private int numSections;
 	*/
@@ -75,7 +73,7 @@ public class Course {
 		c.isCC = this.isCC;
 		return c;
 	}
-	
+
 	/**
 	 * Constructs and adds a Section object to the List of Sections of the current Course object. If the maximum number of Sections has been reached, do nothing.
 	 * @param s the Section object to be added to the List of Sections of this Course object
