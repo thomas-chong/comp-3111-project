@@ -19,10 +19,8 @@ public class Course {
 	private String description ;
 	private String exclusion;
 	private boolean isCC;
-
 	//private Slot [] slots;
 	//private int numSlots;
-
 	private Section [] sections;
 	private int numSections;
 	*/
