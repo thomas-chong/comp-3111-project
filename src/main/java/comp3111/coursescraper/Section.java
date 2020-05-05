@@ -4,7 +4,7 @@ enum timeType {AM, PM}
 enum dayType {MON, TUE, WED, THU, FRI, SAT}
 
 public class Section{
-	private static final int DEFAULT_MAX_SLOT = 10;
+	private static final int DEFAULT_MAX_SLOT = 3;
 	private static final int DEFAULT_MAX_INSTRUCTOR = 20;
 	private String section;
 	private String id;
@@ -98,6 +98,7 @@ public class Section{
 		}
 		return false;
 	}
+	
 	/**
 	 * @param selection the target time of day (AM/PM)
 	 * @return true if this Section has Slots in the target time of day; false otherwise
@@ -117,6 +118,17 @@ public class Section{
 					return true;
 				}
 			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @return true if this Section is valid; false otherwise
+	 */
+	public boolean isValid() {
+		if (section.contains("L") || section.contains("LA") || section.contains("T")) {
+			return true;
 		}
 		return false;
 	}
