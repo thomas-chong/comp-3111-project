@@ -180,5 +180,29 @@ public class Scraper {
 		}
 		return null;
 	}
+	
+	public List<String> scrapeSubject(String baseurl, String term){
+		try {
+			HtmlPage page = client.getPage(baseurl + "/" + term + "/");
+			List<?> ugItems = (List<?>) page.getByXPath("//a[@class='ug']");
+			List<?> pgItems = (List<?>) page.getByXPath("//a[@class='pg']");
+			
+			Vector<String> result = new Vector<String>();
+			
+			for ( HtmlElement e : (List<HtmlElement>) ugItems) {
+				result.add(e.asText());
+			}
+			
+			for ( HtmlElement e : (List<HtmlElement>) pgItems) {
+				result.add(e.asText());
+			}
+			
+			return result;
+
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
 
 }

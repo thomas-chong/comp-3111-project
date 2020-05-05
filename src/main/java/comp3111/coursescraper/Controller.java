@@ -18,6 +18,9 @@ import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
 
 import java.util.Random;
+
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 import java.util.List;
 public class Controller {
 	Filter filter = new Filter();
@@ -120,6 +123,36 @@ public class Controller {
     
     @FXML
     void allSubjectSearch() {
+    	int ALL_SUBJECT_COUNT = 0;
+    	int TOTAL_NUMBER_OF_COURSES = 0;
+    	
+    	List<String> subjectList = scraper.scrapeSubject(textfieldURL.getText(), textfieldTerm.getText());
+    	
+    	ALL_SUBJECT_COUNT = subjectList.size();
+    	
+    	textAreaConsole.setText("Total Number of Categories/Code Prefix: " + ALL_SUBJECT_COUNT + "\n\n");
+    	
+    	
+    	
+    	int count = 0;
+    	for (String subject : subjectList) {
+    		List<Course> temp;
+    		temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),subject);
+    		
+    		for (Course a : temp) {
+    			courseList.add(a);
+    			TOTAL_NUMBER_OF_COURSES++;
+    			//System.out.println(a.getTitle() + " " + TOTAL_NUMBER_OF_COURSES);
+    			
+    		}
+    		System.out.println("SUBJECT is done.");
+    		count++;
+    		progressbar.setProgress(count/ALL_SUBJECT_COUNT);
+    	}
+    	
+    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Courses fetched:  " + TOTAL_NUMBER_OF_COURSES + "\n\n");
+    	
+    	
     	
     }
 
@@ -129,8 +162,8 @@ public class Controller {
     }
 
     @FXML
-    void findSfqEnrollCourse() {
-
+    void findSfqEnrollCourse() {	
+    	
     }
 
     @FXML
@@ -152,7 +185,7 @@ public class Controller {
     			Section s = c.getSection(i);
     			for (int j = 0; j < s.getNumSlots(); j++) {
     				Slot t = s.getSlot(j);
-    				newline += "Slot " + counter + ":" + t + "\n" + s.getSections() + " (" + s.getID() + ")\n";
+    				newline += "Slot " + counter + ":" + t + "\n" + s.getSections() + " (" + s.getID() + ")\n" + t.getDay() + "\n";
     				counter++;
     			}
     			if (!s.isValid()) {
