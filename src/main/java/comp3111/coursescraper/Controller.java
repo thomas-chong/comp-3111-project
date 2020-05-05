@@ -135,20 +135,39 @@ public class Controller {
 
     @FXML
     void search() {
+    	int NUMBER_OF_SECTIONS = 0;
+    	int NUMBER_OF_COURSES = 0;
+    	
     	courseList = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	
+    	if (courseList == null) {
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Error 404. Please check your input again.");
+    	}
+    	
     	for (Course c : courseList) {
     		String newline = c.getTitle() + "\n";
+    		boolean courseCount = true;
     		int counter = 0;
     		for (int i = 0; i < c.getNumSections(); i++) {
     			Section s = c.getSection(i);
     			for (int j = 0; j < s.getNumSlots(); j++) {
     				Slot t = s.getSlot(j);
-    				newline += "Slot " + counter + ":" + t + "\n";
+    				newline += "Slot " + counter + ":" + t + "\n" + s.getSections() + " (" + s.getID() + ")\n";
     				counter++;
     			}
+    			if (!s.isValid()) {
+    				courseCount = false;
+    			}
     		}
+    		if (courseCount) {
+    			NUMBER_OF_COURSES++;
+    		}
+    		NUMBER_OF_SECTIONS += c.getNumSections();
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
+    	
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of difference sections in this search: " + NUMBER_OF_SECTIONS);
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of Course in this search: " + NUMBER_OF_COURSES);
     	
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
