@@ -2,6 +2,7 @@ package comp3111.coursescraper;
 
 import java.net.URLEncoder;
 import java.util.List;
+import java.lang.Math;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
@@ -210,8 +211,9 @@ public class Scraper {
 
 	public List<SFQ> scrapeSFQ(String sfqurl) {
 		try {
-			// HtmlPage page = client.getPage(sfqurl);
-			HtmlPage page = client.getPage("file:///C:/Users/User/git/comp-3111-project/src/main/resources/eng-f19.html");
+			HtmlPage page = client.getPage(sfqurl);
+			// Change sfqurl to html file path for testing
+			//HtmlPage page = client.getPage("file:///C:/Users/User/git/comp-3111-project/src/main/resources/eng-f19.html");
 			List<?> dept = page.getByXPath("//table[2]/tbody/tr/td[1]");
 			Vector<SFQ> result = new Vector<SFQ>();
 			List<?> tables = (List<?>) page.getByXPath("//table");
@@ -258,8 +260,9 @@ public class Scraper {
 	
 	public List<SFQ> scrapeInstructorSFQ(String sfqurl) {
 		try {
-			// HtmlPage page = client.getPage(sfqurl);
-			HtmlPage page = client.getPage("file:///C:/Users/User/git/comp-3111-project/src/main/resources/eng-f19.html");
+			HtmlPage page = client.getPage(sfqurl);
+			// Change sfqurl to html file path for testing
+			//HtmlPage page = client.getPage("file:///C:/Users/User/git/comp-3111-project/src/main/resources/sfq.html");
 			List<?> dept = page.getByXPath("//table[2]/tbody/tr/td[1]");
 			Vector<SFQ> result = new Vector<SFQ>();
 			List<?> tables = (List<?>) page.getByXPath("//table");
