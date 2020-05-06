@@ -36,13 +36,10 @@ public class TimetableBlock {
 		for (int i=0; i < numSlots; i++) {
 			block[i] = new Label(c.getCode() + "\n" + s.getSections());
 			double start = slots[i].getStartHour() + (Double.valueOf(slots[i].getStartMinute())/60);
-			System.out.println("H: " + slots[i].getStartHour() + " M: " + 
-					Double.valueOf(slots[i].getStartMinute())/60);
 			block[i].setBackground(new Background(new BackgroundFill(Color.rgb(r,g,b), CornerRadii.EMPTY, Insets.EMPTY)));
 			block[i].setTextFill(color.WHITE);
 			block[i].setPadding(new Insets(0,0,0,3));
 			block[i].setBlendMode(BlendMode.ADD);
-			System.out.println("R: " + r + " G: " + g + " B: " + b);
 			block[i].setLayoutX((slots[i].getDay() + 1) * 100 + 1.5);
 			block[i].setLayoutY(start * 20 - 132);  
 			block[i].setMinWidth(100.0);
