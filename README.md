@@ -5,6 +5,7 @@
 ## 1. CHONG, Cheuk Hei
 > email: chchongaa | github: thomas-chong | dev-branch: thomas-test
 > Task 1 & Task 5
+
 ## 2. LAW, Kai Yuet
 > email: kylawah | github: lky-bulbasaur | dev_branch: ian-test
 > Task 2 & Task 3
