@@ -76,11 +76,11 @@ public class Task3FxTest extends ApplicationTest {
 		clickOn("#tabList");
 		TableView table = (TableView)s.lookup("#sectionTable");
 		CheckBox enroll = ((ListItem) table.getItems().get(6)).getIsEnrolled();
-		enroll.setSelected(true);
+		clickOn(enroll);
 		assertTrue(
 				(console.getText().substring(0,300).contains("(1574)"))
 				);
-		enroll.setSelected(false);
+		clickOn(enroll);
 		assertFalse(
 				(console.getText().substring(0,300).contains("(1574)"))
 				);
@@ -97,7 +97,7 @@ public class Task3FxTest extends ApplicationTest {
 		clickOn("#tabList");
 		TableView table = (TableView)s.lookup("#sectionTable");
 		CheckBox enroll = ((ListItem) table.getItems().get(6)).getIsEnrolled();
-		enroll.setSelected(true);
+		clickOn(enroll);
 		clickOn("#tabMain");
 		subject.setText("BIBU");
 		clickOn("#buttonSearch");
@@ -105,8 +105,8 @@ public class Task3FxTest extends ApplicationTest {
 		clickOn("#tabList");
 		table = (TableView)s.lookup("#sectionTable");
 		enroll = ((ListItem) table.getItems().get(0)).getIsEnrolled();
-		enroll.setSelected(true);
-		enroll.setSelected(false);
+		clickOn(enroll);
+		clickOn(enroll);
 		assertTrue(
 				(console.getText().substring(0,300).contains("(1574)"))
 				);
@@ -117,6 +117,6 @@ public class Task3FxTest extends ApplicationTest {
 		clickOn("#tabList");
 		table = (TableView)s.lookup("#sectionTable");
 		enroll = ((ListItem) table.getItems().get(6)).getIsEnrolled();
-		enroll.setSelected(false);
+		clickOn(enroll);
 	}		
 }
