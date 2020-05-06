@@ -7,6 +7,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -17,6 +18,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -29,6 +31,7 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.Collections;
 import java.util.List;
+import java.math.BigDecimal;
 
 /**
  * Placeholder
@@ -38,10 +41,13 @@ import java.util.List;
 
 public class Controller {
 	Filter filter = new Filter();
+
 	List<Course> courseList = null;
 	List<Course> filteredCourseList = null;
-  List<Course> enrolledCourseList = new Vector<Course>();
+	List<Course> enrolledCourseList = new Vector<Course>();
 	boolean twiceClick = false;
+	List<SFQ> sfqList;
+	List<TimetableBlock> blocklist = new Vector<TimetableBlock>();
 
     @FXML
     private Tab tabMain;
@@ -159,6 +165,11 @@ public class Controller {
     private Scraper scraper = new Scraper();
     
     @FXML
+    void initialize() {
+    	buttonSfqEnrollCourse.setDisable(true);
+    }
+    
+    @FXML
     void allSubjectSearch() {
     	int ALL_SUBJECT_COUNT = 0;
     	int TOTAL_NUMBER_OF_COURSES = 0;
@@ -199,18 +210,26 @@ public class Controller {
     		twiceClick = true;
     	}
 
-    	
+    	buttonSfqEnrollCourse.setDisable(false);
     	
     }
 
     @FXML
     void findInstructorSfq() {
-    	buttonInstructorSfq.setDisable(true);
+    	List<SFQ> sfqList = scraper.scrapeInstructorSFQ(textfieldSfqUrl.getText());
+    	printSFQConsole(sfqList, true);
     }
 
     @FXML
-    void findSfqEnrollCourse() {	
-    	
+    void findSfqEnrollCourse() {
+    	List<SFQ> sfqList = scraper.scrapeSFQ(textfieldSfqUrl.getText());
+    	List<SFQ> sfqEnrolled = new Vector<SFQ>();
+    	for (SFQ s: sfqList) {
+    		for (Course c: enrolledCourseList)
+    			if (s.getTitle().equalsIgnoreCase(c.getCode()) && !sfqEnrolled.contains(s))
+    				sfqEnrolled.add(s);
+    	} 
+    	printSFQConsole(sfqEnrolled, false);
     }
 
     @FXML
@@ -324,7 +343,7 @@ public class Controller {
 	
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Display Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: "+ "\n" + output);
     	
-    	//Add a random block on Saturday
+    	/* Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
     	Label randomLabel = new Label("COMP1022\nL1");
     	Random r = new Random();
@@ -338,7 +357,9 @@ public class Controller {
     	randomLabel.setMinHeight(60);
     	randomLabel.setMaxHeight(60);
     
-    	ap.getChildren().addAll(randomLabel);
+    	ap.getChildren().addAll(randomLabel); */
+    	
+    	buttonSfqEnrollCourse.setDisable(false);   // For Task 6: SFQ
     }
   
     /*	=== === === === === === === === === === === === === === === === 
@@ -385,6 +406,17 @@ public class Controller {
     	}
     }
     
+
+    /* printConsole function for SFQ */
+    void printSFQConsole(List<SFQ> sfqList, boolean instructor) {
+    	textAreaConsole.setText("");
+    	textAreaConsole.setText((instructor? "Instructor":"Course") + "\t\t\t" + "(Average) SFQ Score");
+    	for (SFQ s : sfqList) {
+    		String newline = (instructor? s.getInstructor():s.getTitle()) + "\t\t" + (Math.round(s.getSFQ() * 10000.0) / 10000.0);
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	}
+    }
+
     /**
      * Fires when the button "Select All" or "De-select All" is pressed. When "Select All" is pressed, all checkboxes in the Filter tab are checked, and the button becomes "De-select All".
      * <br><br>
@@ -398,7 +430,7 @@ public class Controller {
     		checkboxAM.setSelected(true);
     		checkboxPM.setSelected(true);
     		checkboxMon.setSelected(true);
-    		checkboxTue.setSelected(true);
+    		checkboxTue.setSelected(true); 
     		checkboxWed.setSelected(true);
     		checkboxThu.setSelected(true);
     		checkboxFri.setSelected(true);
@@ -639,6 +671,10 @@ public class Controller {
 	    			ListItem t = new ListItem(c, c.getSection(i), flag);
 	    			sectionTableData.add(t);
 	    			
+	    			// AnchorPane for Timetable update
+	    			AnchorPane ap = (AnchorPane) tabTimetable.getContent();
+	    			ap.setBlendMode(BlendMode.SRC_ATOP);
+	    			
 	    			// Checkbox listener for enrollment
 	    			t.getIsEnrolled().selectedProperty().addListener(new ChangeListener<Boolean>() {
 	    				public void changed(ObservableValue ov, Boolean old_value, Boolean new_value) {
@@ -647,13 +683,28 @@ public class Controller {
 	    						Course enrollCourse = c.cloneWithoutSections();
 	    						enrollCourse.addSection(s);
 	    						enrolledCourseList.add(enrollCourse);
-	    					
+	    						// Update timetable (create block)
+	    						TimetableBlock block = new TimetableBlock(enrollCourse, s);
+	    						for (int k=0; k < block.getNumSlots(); k++) {
+	    							ap.getChildren().addAll(block.getBlock(k));
+	    						}
+	
+	    						blocklist.add(block);  
+	    						// End of timetable update    					
 	    					// Withdraw course from enrolledCourseList
 	    					} else {	
 	    						for (int k = 0; k < enrolledCourseList.size(); ++k) {
 	    							Course withdrawCourse = enrolledCourseList.get(k);
 	    							if (withdrawCourse.getSection(0).getID().contentEquals(s.getID())) {
 	    								enrolledCourseList.remove(k);
+	    								// Update (remove) course from timetable
+	    								for (int h=0; h < blocklist.size(); h++) {
+	    									if (s.getID().equals(blocklist.get(h).getID())) {
+	    										for (int g=0; g < blocklist.get(h).getNumSlots(); g++)
+	    											ap.getChildren().remove(blocklist.get(h).getBlock(g));
+	    										blocklist.remove(h);
+	    									}
+	    								}  // End of timetable update
 	    								break;
 	    							}
 	    						}
