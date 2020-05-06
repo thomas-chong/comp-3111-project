@@ -261,9 +261,7 @@ public class Scraper {
 				int count = 1;
 				String name = result.get(i).getInstructor();
 				double totalsfq = result.get(i).getSFQ();
-				System.out.println("A: " + name);
 				for (int j = i+1; j < result.size(); j++) {
-					System.out.println("\t" + result.get(j).getInstructor());
 					if (result.get(j).getInstructor().contains(name) ||
 							name.contains(result.get(j).getInstructor())) {
 						count++;
