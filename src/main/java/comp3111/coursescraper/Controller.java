@@ -648,10 +648,6 @@ public class Controller {
     	}
     }
     
-    /**
-     *  (To be completed)
-     *  Updates timetable in "Time Table" tab whenever a new course section is enrolled or removed
-     */
     @FXML
     void tabListSelected() {
     	// Initialization
