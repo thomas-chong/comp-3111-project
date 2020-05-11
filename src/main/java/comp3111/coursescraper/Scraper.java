@@ -209,6 +209,12 @@ public class Scraper {
 		return null;
 	}
 
+	/**
+	 * Scraper function to obtain data from SFQ website.
+	 * Organize SFQ scores for each course and take simple average if multiple sections exist.
+	 * @param sfqurl: URL of SFQ website
+	 * @return A list of SFQ class objects
+	 */
 	public List<SFQ> scrapeSFQ(String sfqurl) {
 		try {
 			HtmlPage page = client.getPage(sfqurl);
@@ -258,6 +264,12 @@ public class Scraper {
 		return null;
 	}
 	
+	/**
+	 * Scraper function to obtain data from SFQ website.
+	 * Organize SFQ scores for each instructor and take simple average if instructor teaches multiple sections or courses.
+	 * @param sfqurl: URL of SFQ website
+	 * @return A list of SFQ class objects
+	 */
 	public List<SFQ> scrapeInstructorSFQ(String sfqurl) {
 		try {
 			HtmlPage page = client.getPage(sfqurl);

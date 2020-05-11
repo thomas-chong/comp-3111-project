@@ -213,13 +213,21 @@ public class Controller {
     	buttonSfqEnrollCourse.setDisable(false);
     	
     }
-
+    
+    /**
+     *  Fires when button "List instructor's average SFQ" is pressed.
+     *  Scraps instructor's SFQ data from SFQ website URL entered above and prints it in the console.
+     */
     @FXML
     void findInstructorSfq() {
     	List<SFQ> sfqList = scraper.scrapeInstructorSFQ(textfieldSfqUrl.getText());
     	printSFQConsole(sfqList, true);
     }
-
+    
+    /**
+     *  Fires when button "Find SFQ with my enrolled courses" is pressed.
+     *  Scraps data from SFQ URL entered above, checked with EnrolledCourseList and print data in console.
+     */
     @FXML
     void findSfqEnrollCourse() {
     	List<SFQ> sfqList = scraper.scrapeSFQ(textfieldSfqUrl.getText());
@@ -630,6 +638,10 @@ public class Controller {
     	}
     }
     
+    /**
+     *  (To be completed)
+     *  Updates timetable in "Time Table" tab whenever a new course section is enrolled or removed
+     */
     @FXML
     void tabListSelected() {
     	// Initialization
