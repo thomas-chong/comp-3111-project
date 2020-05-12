@@ -170,6 +170,10 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
+    /**
+     * Run before the JavaFX program begins. 
+     * Sets button "Find SFQ with my enrolled courses" to disabled on default.
+     */
     @FXML
     void initialize() {
     	buttonSfqEnrollCourse.setDisable(true);
@@ -255,7 +259,7 @@ public class Controller {
     }
     
     /**
-     *  Fires when button "List instructor's average SFQ" is pressed.
+     *  Fires when button "List instructors' average SFQ" is pressed.
      *  Scraps instructor's SFQ data from SFQ website URL entered above and prints it in the console.
      */
     @FXML
@@ -462,7 +466,13 @@ public class Controller {
     }
     
 
-    /* printConsole function for SFQ */
+    /**
+     * Prints SFQ information on the console.
+     * If performing "Find SFQ with my enrolled courses", print course title and its (average) SFQ score.
+     * If performing "List instructors' average SFQ", print instructor name and their average SFQ score.
+     * @param sfqList: A list storing SFQ data in SFQ class format
+     * @param instructor: A boolean parameter. If true, instructors' SFQ score will be printed. If false, enrolled courses SFQ score will be printed.		  
+     */
     void printSFQConsole(List<SFQ> sfqList, boolean instructor) {
     	textAreaConsole.setText("");
     	textAreaConsole.setText((instructor? "Instructor":"Course") + "\t\t\t" + "(Average) SFQ Score");
@@ -685,10 +695,6 @@ public class Controller {
     	}
     }
     
-    /**
-     *  (To be completed)
-     *  Updates timetable in "Time Table" tab whenever a new course section is enrolled or removed
-     */
     @FXML
     void tabListSelected() {
     	// Initialization

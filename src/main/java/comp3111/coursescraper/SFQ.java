@@ -1,7 +1,6 @@
 package comp3111.coursescraper;
 /**
  * SFQ class to store sets of SFQ information scrapped from the SFQ website.
- * <br><br>
  * Each SFQ object contains either the course title or the instructor, as well as the SFQ score.
  * @author justinlyli
  * 
