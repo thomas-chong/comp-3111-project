@@ -38,7 +38,7 @@ public class Task1FxTest extends ApplicationTest{
 		TextArea console = (TextArea)s.lookup("#textAreaConsole");
 		Button b = (Button)s.lookup("#buttonSearch");
 		clickOn(b);
-		//while (console.getText().isEmpty()) { }
+		while (console.getText().isEmpty()) { }
 		sleep(2000);
 		assertEquals(b.getText(), "Search");
 		assertEquals(console.getText(), "\n" + 
