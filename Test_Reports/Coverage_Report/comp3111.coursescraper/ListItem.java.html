@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ListItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comp-3111-project</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">ListItem.java</span></div><h1>ListItem.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.CheckBox;
+
+/**
+ * ListItem class is a container class for storing data in JavaFx TableView UI element. Each ListItem object constitutes a record in TableView. Each record describes a Section object using 5 fields:
+ * &lt;ul&gt;
+ * 	&lt;li&gt;&lt;em&gt;Course Code&lt;/em&gt;, a String field which represents the unique course code of each Course (e.g. &quot;COMP 3111&quot;)&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;Section&lt;/em&gt;, a String field which represents the unique section code of each Section (e.g. &quot;L1&quot;)&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;Course Title&lt;/em&gt;, a String field which represents the course title and the credit units of a Course (e.g. &quot;Software Engineering (4 units)&quot;)&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;Instructor&lt;/em&gt;, a String field which represents the name of Instructor(s) of a Section (e.g. &quot;LEUNG, Wai Ting&quot;)&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;isEnrolled&lt;/em&gt;, a CheckBox field which represents and allows the changing of the enrollment status of a Course&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;br&gt;
+ * Each ListItem object contains references to its corresponding Section and Course stored in other List of Courses. Each ListItem object can be uniquely identified with a 4-digit section-ID retrieved from its associated Section object. Enrollment status can be preserved at object instantiation.
+ * @author lky-bulbasaur
+ */
+
+public class ListItem {
+	private final SimpleStringProperty code;
+	private final SimpleStringProperty sectionName;
+	private final SimpleStringProperty courseName;
+	private final SimpleStringProperty instructorName;
+	private CheckBox isEnrolled;
+	
+	private Course course;
+	private Section section;
+	
+	/**
+	 * General constructor of ListItem class. Constructs and returns a ListItem object that defines a Section in a format displayable in JavaFx TableView UI elements. Enrollment status can be preserved by passing true to &lt;em&gt;enrolled&lt;/em&gt; at instantiation when invoking other methods.
+	 * @param c the reference to a Course to which the Section belongs; a dynamically-allocated Course object should be passed into this parameter
+	 * @param s the reference to a Section; a dynamically-allocated Section object should be passed into this parameter
+	 * @param enrolled true if this ListItem object represents a Section enrolled by the user; false otherwise
+	 */
+<span class="fc" id="L39">	public ListItem(Course c, Section s, boolean enrolled) {</span>
+<span class="fc" id="L40">		this.course = c;		// Shallow copy</span>
+<span class="fc" id="L41">		this.section = s;		// Shallow copy</span>
+<span class="fc" id="L42">		this.code = new SimpleStringProperty(c.getCode());</span>
+<span class="fc" id="L43">		this.sectionName = new SimpleStringProperty(s.getSections());</span>
+<span class="fc" id="L44">		this.courseName = new SimpleStringProperty(c.getTitle());</span>
+<span class="fc" id="L45">		String t = &quot;&quot;;</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">		for (int i = 0; i &lt; s.getNumInstructors(); ++i) {</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">			if (s.getInstructor(i).getLastName().contentEquals(&quot;null&quot;)) {</span>
+<span class="nc" id="L48">				t += &quot;TBA&quot;;</span>
+			} else {
+<span class="fc" id="L50">				t += s.getInstructor(i).getLastName() + &quot;, &quot; + s.getInstructor(i).getFirstName();</span>
+			}
+<span class="fc bfc" id="L52" title="All 2 branches covered.">			if (i + 1 != s.getNumInstructors()) {</span>
+<span class="fc" id="L53">				t += &quot;\n&quot;;</span>
+			}
+		}
+<span class="fc" id="L56">		this.instructorName = new SimpleStringProperty(t);</span>
+<span class="fc" id="L57">		this.isEnrolled = new CheckBox();</span>
+<span class="fc" id="L58">		this.isEnrolled.setSelected(enrolled);</span>
+<span class="fc" id="L59">	}</span>
+	
+	/**
+	 * Course code accessor.
+	 * @return the course code of the Course to which the Section belongs
+	 */
+	public String getCode() {
+<span class="fc" id="L66">		return code.get();</span>
+	}
+	
+	/**
+	 * Course code mutator.
+	 * @param n the course code to be set
+	 */
+	public void setCode(String n) {
+<span class="nc" id="L74">		code.set(n);</span>
+<span class="nc" id="L75">	}</span>
+	
+	/**
+	 * Section code accessor.
+	 * @return the section code of the Section
+	 */
+	public String getSectionName() {
+<span class="fc" id="L82">		return sectionName.get();</span>
+	}
+	
+	/**
+	 * Section code mutator.
+	 * @param n the section code to be set
+	 */
+	public void setSectionName(String n) {
+<span class="nc" id="L90">		sectionName.set(n);</span>
+<span class="nc" id="L91">	}</span>
+	
+	/**
+	 * Course title accessor.
+	 * @return the title of the Course to which the Section belongs
+	 */
+	public String getCourseName() {
+<span class="fc" id="L98">		return courseName.get();</span>
+	}
+	
+	/**
+	 * Course title mutator.
+	 * @param n the course title to be set
+	 */
+	public void setCourseName(String n) {
+<span class="nc" id="L106">		courseName.set(n);</span>
+<span class="nc" id="L107">	}</span>
+	
+	/**
+	 * Instructor name accessor.
+	 * @return the full name of the Instructor of the Section
+	 */
+	public String getInstructorName() {
+<span class="fc" id="L114">		return instructorName.get();</span>
+	}
+	
+	/**
+	 * Instructor name mutator.
+	 * @param n the Instructor's full name to be set
+	 */
+	public void setInstructorName(String n) {
+<span class="nc" id="L122">		instructorName.set(n);</span>
+<span class="nc" id="L123">	}</span>
+	
+	/**
+	 * Enrollment status checkbox accessor.
+	 * @return the Course's enrollment status checkbox
+	 */
+	public CheckBox getIsEnrolled() {
+<span class="fc" id="L130">		return isEnrolled;</span>
+	}
+	
+	/**
+	 * Enrollment status checkbox mutator.
+	 * @param n the Course's enrollment status checkbox to be set
+	 */
+	public void setIsEnrolled(CheckBox n) {
+<span class="nc" id="L138">		this.isEnrolled = n;</span>
+<span class="nc" id="L139">	}</span>
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

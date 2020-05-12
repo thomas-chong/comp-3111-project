@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TimetableBlock.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comp-3111-project</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">TimetableBlock.java</span></div><h1>TimetableBlock.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.geometry.Insets;
+import javafx.scene.effect.Blend; 
+import javafx.scene.effect.BlendMode; 
+import javafx.scene.effect.ColorInput; 
+import javafx.scene.paint.Color;
+
+import java.util.Random;
+
+/**
+ * TimetableBlock class to create blocks in Timetable tab and store block contents
+ * &lt;br&gt;&lt;br&gt;
+ * Contains:
+ * &lt;ul&gt;
+ * &lt;li&gt;Course section ID&lt;/li&gt;
+ * &lt;li&gt;Array of Labels storing timetable blocks of the same course section &lt;/li&gt;
+ * &lt;li&gt;Number of blocks for the course section &lt;/li&gt;
+ * &lt;li&gt;Array of time slots&lt;/li&gt;
+ * &lt;li&gt;Block color assigned for the course section&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;br&gt;
+ * @author justinlyli
+ *
+ */
+public class TimetableBlock {
+	private String secID;
+	private Label [] block;
+	private int numSlots;
+	private Slot [] slots;
+	private Color color;
+	
+	/**
+	 * Constructor for TimetableBlock 
+	 * @param c: Course class object
+	 * @param s: Section class object
+	 */
+<span class="fc" id="L44">	public TimetableBlock(Course c, Section s) {</span>
+<span class="fc" id="L45">		secID = s.getID();</span>
+<span class="fc" id="L46">		numSlots = s.getNumSlots();</span>
+<span class="fc" id="L47">		slots = new Slot[numSlots];</span>
+<span class="fc" id="L48">		block = new Label[numSlots];</span>
+		// Generate random color
+<span class="fc" id="L50">		Random random = new Random();</span>
+<span class="fc" id="L51">        int r = random.nextInt(255);</span>
+<span class="fc" id="L52">        int g = random.nextInt(255);</span>
+<span class="fc" id="L53">        int b = random.nextInt(255);</span>
+        
+<span class="fc bfc" id="L55" title="All 2 branches covered.">		for (int i=0; i &lt; numSlots; i++)</span>
+<span class="fc" id="L56">			slots[i] = s.getSlot(i);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">		for (int i=0; i &lt; numSlots; i++) {</span>
+<span class="fc" id="L58">			block[i] = new Label(c.getCode() + &quot;\n&quot; + s.getSections());</span>
+<span class="fc" id="L59">			double start = slots[i].getStartHour() + (Double.valueOf(slots[i].getStartMinute())/60);</span>
+<span class="fc" id="L60">			block[i].setBackground(new Background(new BackgroundFill(Color.rgb(r,g,b), CornerRadii.EMPTY, Insets.EMPTY)));</span>
+<span class="fc" id="L61">			block[i].setTextFill(color.WHITE);</span>
+<span class="fc" id="L62">			block[i].setPadding(new Insets(0,0,0,3));</span>
+<span class="fc" id="L63">			block[i].setBlendMode(BlendMode.ADD);</span>
+<span class="fc" id="L64">			block[i].setLayoutX((slots[i].getDay() + 1) * 100 + 1.5);</span>
+<span class="fc" id="L65">			block[i].setLayoutY(start * 20 - 132);  </span>
+<span class="fc" id="L66">			block[i].setMinWidth(100.0);</span>
+<span class="fc" id="L67">			block[i].setMaxWidth(100.0);</span>
+<span class="fc" id="L68">			double end = slots[i].getEndHour() + (Double.valueOf(slots[i].getEndMinute())/60);</span>
+<span class="fc" id="L69">			double duration = end - start;</span>
+<span class="fc" id="L70">			block[i].setMaxHeight(duration * 20 + 3.9); </span>
+<span class="fc" id="L71">			block[i].setMinHeight(duration * 20 + 3.9);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">			if ((duration * 20 + 3.9) &lt;= 25)</span>
+<span class="nc" id="L73">				block[i].setText(c.getCode() + &quot;  &quot; + s.getSections());</span>
+		}
+<span class="fc" id="L75">	}</span>
+	
+	/**
+	 * Accessor function to obtain a specific block (of type label) given an index
+	 * @param index: Index of type int
+	 * @return A timetable block of type Label
+	 */
+	public Label getBlock(int index) {
+<span class="fc" id="L83">		return block[index];</span>
+	}
+	
+	/**
+	 * Accessor function to obtain an array of timetable blocks
+	 * @return An array of timetable blocks of type Label
+	 */
+	public Label[] getBlockArr() {
+<span class="nc" id="L91">		return block;</span>
+	}
+	
+	/**
+	 * Accessor function to obtain number of slots in the course section
+	 * @return Value of int data type
+	 */
+	public int getNumSlots() {
+<span class="fc" id="L99">		return numSlots;</span>
+	}
+	
+	/**
+	 * Accessor function to obtain section ID
+	 * @return Section ID in type String
+	 */
+	public String getID() {
+<span class="fc" id="L107">		return secID;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Section.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comp-3111-project</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">Section.java</span></div><h1>Section.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+<span class="fc" id="L3">enum timeType {AM, PM}</span>
+<span class="fc" id="L4">enum dayType {MON, TUE, WED, THU, FRI, SAT}</span>
+
+/**
+ * Section class defines every sections belonging to a course. Each Section object is uniquely identified with a unique 4-digit section-ID (e.g. 1808). Within each Course, a Section object can be uniquely identified with a section code (e.g. &quot;LA1&quot;). A valid Section must have a section code that either starts with &quot;L&quot;, &quot;LA&quot; or &quot;T&quot;, and has at most 3 Slots. All other Sections are considered invalid and will be ignored.
+ * &lt;br&gt;&lt;br&gt;
+ * Two sets of more readable enumerations &lt;em&gt;timeType&lt;/em&gt; and &lt;em&gt;dayType&lt;/em&gt; have been defined for more intuitive data access. These include:
+ * &lt;ul&gt;
+ * 	&lt;li&gt;&lt;em&gt;AM&lt;/em&gt;, which represents &quot;time in AM&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;PM&lt;/em&gt;, which represents &quot;time in PM&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;MON&lt;/em&gt;, which represents &quot;Monday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;TUE&lt;/em&gt;, which represents &quot;Tuesday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;WED&lt;/em&gt;, which represents &quot;Wednesday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;THU&lt;/em&gt;, which represents &quot;Thursday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;FRI&lt;/em&gt;, which represents &quot;Friday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;SAT&lt;/em&gt;, which represents &quot;Saturday&quot;&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;br&gt;
+ * A Section object provides methods for data manipulation between its own type. 
+ * @author lky-bulbasaur
+ *
+ */
+
+public class Section{
+	private static final int DEFAULT_MAX_SLOT = 3;
+	private static final int DEFAULT_MAX_INSTRUCTOR = 20;
+	private String section;
+	private String id;
+	private Slot [] slots;
+	private int numSlots;
+	private Instructor [] instructor;
+	private int numInstructor;
+	
+	/**
+	 * Default constructor for Section class.
+	 */
+<span class="fc" id="L39">	public Section() {</span>
+<span class="fc" id="L40">		slots = new Slot[DEFAULT_MAX_SLOT];</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">		for (int i = 0; i &lt; DEFAULT_MAX_SLOT; i++) slots[i] = null;</span>
+<span class="fc" id="L42">		numSlots = 0;</span>
+<span class="fc" id="L43">		instructor = new Instructor[DEFAULT_MAX_INSTRUCTOR];</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">		for (int i = 0; i &lt; DEFAULT_MAX_INSTRUCTOR; i++) instructor[i] = null;</span>
+<span class="fc" id="L45">	}</span>
+
+	/**
+	 * Constructs and returns an identical Section object via deep-copying.
+	 * @return a Section object with identical attributes
+	 */
+	public Section clone() {
+<span class="fc" id="L52">		Section s = new Section();</span>
+<span class="fc" id="L53">		s.section = this.section;</span>
+<span class="fc" id="L54">		s.id = this.id;</span>
+<span class="fc" id="L55">		s.numSlots = this.numSlots;</span>
+<span class="fc" id="L56">		s.numInstructor = this.numInstructor;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">		for (int i = 0; i &lt; s.numSlots; ++i) {</span>
+<span class="fc" id="L58">			s.slots[i] = this.slots[i].clone();</span>
+		}
+<span class="fc bfc" id="L60" title="All 2 branches covered.">		for (int i = 0; i &lt; s.numInstructor; ++i) {</span>
+<span class="fc" id="L61">			s.instructor[i] = this.instructor[i].clone();</span>
+		}
+<span class="fc" id="L63">		return s;</span>
+	}
+	
+	/**
+	 * Section code mutator.
+	 * @param section the section code to be set
+	 */
+	public void setSection(String section) {
+<span class="fc" id="L71">		this.section = section;</span>
+<span class="fc" id="L72">	}</span>
+	
+	/**
+	 * Section-ID mutator.
+	 * @param id the section-ID to be set
+	 */
+	public void setID(String id) {
+<span class="fc" id="L79">		this.id = id;</span>
+<span class="fc" id="L80">	}</span>
+	
+	/**
+	 * Section code accessor.
+	 * @return the section code of this Section
+	 */
+	public String getSections() {
+<span class="fc" id="L87">		return section;</span>
+	}
+	
+	/**
+	 * Section-ID accessor.
+	 * @return the section-ID of this Section
+	 */
+	public String getID() {
+<span class="fc" id="L95">		return id;</span>
+	}
+	
+	/**
+	 * Constructs and adds a Slot object to the List of Slots of the current Section object. If the maximum number of Slots has been reached, do nothing.
+	 * @param s the Slot object to be added to the List of Slots of this Section
+	 */
+	public void addSlot(Slot s) {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">		if (numSlots &gt;= DEFAULT_MAX_SLOT)</span>
+<span class="nc" id="L104">			return;</span>
+<span class="fc" id="L105">		slots[numSlots++] = s.clone();</span>
+<span class="fc" id="L106">	}</span>
+	
+	/**
+	 * Slot accessor. Returns the Slot object stored in index &lt;em&gt;i&lt;/em&gt; of the List of Slots of the current Section object. If the index &lt;em&gt;i&lt;/em&gt; is out-of-bound, return null.
+	 * @param i the index of the Slot to be retrieved
+	 * @return the required Slot object if index &lt;em&gt;i&lt;/em&gt; is within-bound; null otherwise
+	 */	
+	public Slot getSlot(int i) {
+<span class="pc bpc" id="L114" title="2 of 4 branches missed.">		if (i &gt;= 0 &amp;&amp; i &lt; numSlots)</span>
+<span class="fc" id="L115">			return slots[i];</span>
+<span class="nc" id="L116">		return null;</span>
+	}
+	
+	/**
+	 * Slot number accessor.
+	 * @return the number of Slots owned by this Section
+	 */
+	public int getNumSlots() {
+<span class="fc" id="L124">		return numSlots;</span>
+	}
+	
+	/**
+	 * Instructor number accessor.
+	 * @return the number of Instructors teaching this Section
+	 */
+	public int getNumInstructors() {
+<span class="fc" id="L132">		return numInstructor;</span>
+	}
+	
+	/**
+	 * Instructor accessor. Returns the Instructor object stored in index &lt;em&gt;i&lt;/em&gt; of the List of Instructors of the current Section object. If the index &lt;em&gt;i&lt;/em&gt; is out-of-bound, return null.
+	 * @param i the index of the Instructor to be retrieved
+	 * @return the required Instructor object if index &lt;em&gt;i&lt;/em&gt; is within-bound; null otherwise
+	 */		
+	public Instructor getInstructor(int i) {
+<span class="pc bpc" id="L141" title="2 of 4 branches missed.">		if (i &gt;= 0 &amp;&amp; i &lt; numInstructor)</span>
+<span class="fc" id="L142">			return instructor[i];</span>
+<span class="nc" id="L143">		return null;</span>
+	}
+
+	/**
+	 * Constructs and adds an Instructor object to the List of Instructors of the current Section object. If the maximum number of Instructors has been reached, do nothing.
+	 * @param in the Instructor object to be added to the List of Instructors of this Section
+	 */
+	public void addInstructor(Instructor in) {
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">		if (numInstructor &gt;= DEFAULT_MAX_INSTRUCTOR) {</span>
+<span class="nc" id="L152">			return;</span>
+		}
+<span class="fc" id="L154">		instructor[numInstructor++] = in.clone();</span>
+<span class="fc" id="L155">	}</span>
+	
+	/**
+	 * Checks if this Section contains any Slots on the selected day of week.
+	 * @param selection the target day of week
+	 * @return true if this Section that has Slot(s) on the target day of week; false otherwise
+	 */
+	public boolean hasDay(dayType selection) {
+<span class="fc" id="L163">		int selection_int = selection.ordinal();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">		for (int i = 0; i &lt; getNumSlots(); ++i) {</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">			if (selection_int == getSlot(i).getDay()) {</span>
+<span class="fc" id="L166">				return true;</span>
+			}
+		}
+<span class="fc" id="L169">		return false;</span>
+	}
+	
+	/**
+	 * Checks if this Section contains any Slots at the selected time of day.
+	 * @param selection the target time of day (AM/PM)
+	 * @return true if this Section has Slots in the target time of day; false otherwise
+	 */
+	public boolean hasTime(timeType selection) {
+<span class="fc" id="L178">		int selection_int = selection.ordinal();</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">		if (selection_int == 0) {	// Check for slots with starting time in AM</span>
+			//12:00 is PM
+<span class="fc bfc" id="L181" title="All 2 branches covered.">			for (int i = 0; i &lt; getNumSlots(); ++i) {</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">				if (getSlot(i).getStartHour() &lt; 12) {</span>
+<span class="fc" id="L183">					return true;</span>
+				}
+			}
+		} else {
+<span class="fc bfc" id="L187" title="All 2 branches covered.">			for (int i = 0; i &lt; getNumSlots(); ++i) {</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">				if (getSlot(i).getEndHour() &gt;= 12) {</span>
+<span class="fc" id="L189">					return true;</span>
+				}
+			}
+		}
+<span class="fc" id="L193">		return false;</span>
+	}
+	
+	/**
+	 * Checks if this Section is valid.
+	 * @return true if this Section is valid; false otherwise
+	 */
+	public boolean isValid() {
+<span class="pc bpc" id="L201" title="1 of 6 branches missed.">		if (section.contains(&quot;L&quot;) || section.contains(&quot;LA&quot;) || section.contains(&quot;T&quot;)) {</span>
+<span class="fc" id="L202">			return true;</span>
+		}
+<span class="fc" id="L204">		return false;</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

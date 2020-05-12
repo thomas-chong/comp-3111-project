@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SFQ.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comp-3111-project</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">SFQ.java</span></div><h1>SFQ.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+/**
+ * SFQ class to store sets of SFQ information scrapped from the SFQ website.
+ * Each SFQ object contains either the course title or the instructor, as well as the SFQ score.
+ * @author justinlyli
+ * 
+ */
+public class SFQ {
+	private String title;
+	private String instructor;
+	private double sfq;
+	
+	/**
+	 * Default constructor for SFQ class.
+	 */
+<span class="nc" id="L16">	public SFQ() {</span>
+<span class="nc" id="L17">		title = &quot;&quot;;</span>
+<span class="nc" id="L18">		instructor = &quot;&quot;;</span>
+<span class="nc" id="L19">		sfq = 0;</span>
+<span class="nc" id="L20">	}</span>
+	
+	/**
+	 * Constructor by directly passing the title, instructor and SFQ score to the new SFQ object.
+	 * @param t: Course title
+	 * @param i: Instructor
+	 * @param s: SFQ score
+	 */
+<span class="fc" id="L28">	public SFQ(String t, String i, double s) {</span>
+<span class="fc" id="L29">		title = t;</span>
+<span class="fc" id="L30">		instructor = i;</span>
+<span class="fc" id="L31">		sfq = s;</span>
+<span class="fc" id="L32">	}</span>
+	
+	/**
+	 * Mutator function to modify course title.
+	 * @param t: Course title variable of String type
+	 */
+	public void setTitle(String t) {
+<span class="nc" id="L39">		title = t;</span>
+<span class="nc" id="L40">	}</span>
+	
+	/**
+	 * Accessor function to obtain course title.
+	 * @return Course title of String type
+	 */
+	public String getTitle() {
+<span class="fc" id="L47">		return title;</span>
+	}
+	
+	/**
+	 * Mutator function to modify instructor.
+	 * @param i: Instructor variable of String type
+	 */
+	public void setInstructor(String i) {
+<span class="nc" id="L55">		instructor = i;</span>
+<span class="nc" id="L56">	}</span>
+	
+	/**
+	 * Accessor function to obtain instructor.
+	 * @return Instructor of String type
+	 */
+	public String getInstructor() {
+<span class="fc" id="L63">		return instructor;</span>
+	}
+	
+	/**
+	 * Mutator function to modify SFQ score.
+	 * @param s: SFQ score variable of double type
+	 */
+	public void setSFQ(double s) {
+<span class="nc" id="L71">		sfq = s;</span>
+<span class="nc" id="L72">	}</span>
+	
+	/**
+	 * Accessor function to obtain SFQ score.
+	 * @return SFQ score of double type
+	 */
+	public double getSFQ() {
+<span class="nc" id="L79">		return sfq;</span>
+	}
+	
+	/**
+	 * Mutator function to clear and reset all class members
+	 */
+	public void clear() {
+<span class="nc" id="L86">		title = &quot;&quot;;</span>
+<span class="nc" id="L87">		instructor = &quot;&quot;;</span>
+<span class="nc" id="L88">		sfq = 0;</span>
+<span class="nc" id="L89">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

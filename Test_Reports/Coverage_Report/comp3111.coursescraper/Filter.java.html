@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Filter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comp-3111-project</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">Filter.java</span></div><h1>Filter.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+import java.util.List;
+import java.util.Vector;
+
+<span class="fc" id="L6">enum filterType {AM, PM, MON, TUE, WED, THU, FRI, SAT, CC, NO_EXCLUSION, LAB_TUTORIAL};</span>
+
+/**
+ * Filter class handles filter-toggling and information-filtering. A Filter handler provides methods for the invoker to apply/unapply filters, and to retrieve a List of filtered Courses generated from applying activated filters onto a given List of Courses.
+ * &lt;br&gt;&lt;br&gt;	
+ * A set of more readable enumeration &lt;em&gt;filterType&lt;/em&gt; has been defined for toggling specific filters. These include:
+ * &lt;ul&gt;
+ * 	&lt;li&gt;&lt;em&gt;AM&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot in AM&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;PM&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot in PM&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;MON&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot on Monday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;TUE&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot on Tuesday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;WED&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot on Wednesday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;THU&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot on Thursday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;FRI&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot on Friday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;SAT&lt;/em&gt;, which represents &quot;show only Sections with at least one Slot on Saturday&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;CC&lt;/em&gt;, which represents &quot;show only Sections of Courses which are 4Y CC&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;NO_EXCLUSION&lt;/em&gt;, which represents &quot;show only Sections of Courses which do not define exclusions&quot;&lt;/li&gt;
+ * 	&lt;li&gt;&lt;em&gt;LAB_TUTORIAL&lt;/em&gt;, which represents &quot;show only Sections of Courses which have labs or tutorials&quot;&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;br&gt;
+ * The filters are combined with AND logic. For example, if both MON and WED filters are applied, the filtered list of Courses should contain Sections with Slots on both Monday and Wednesday.
+ * 
+ * @author lky-bulbasaur
+ */
+
+public class Filter {
+<span class="fc" id="L32">	private static boolean [] filter = {false, false, false, false, false, false, false, false, false, false, false};</span>
+	
+	/**
+	 * Default constructor of Filter class.
+	 */
+<span class="fc" id="L37">	public Filter() {</span>
+		
+<span class="fc" id="L39">	}</span>
+	
+	/**
+	 * Constructs and returns a List of Courses which contains only Courses and their Sections that satisfies the criteria specified by the active filters. These matching Courses and Sections are deep-copied from the Course elements of the input &lt;em&gt;courseList&lt;/em&gt; and the Sections they own. Each Course element in the returned List contains only Sections that match the activated filters. Courses with no matching Sections will not appear in the returned List. 
+	 * @param courseList a List of Courses to be filtered
+	 * @return a List of filtered Courses
+	 */
+	public List&lt;Course&gt; getFilteredCourseList(List&lt;Course&gt; courseList) {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">		if (courseList == null) return null;</span>
+		
+<span class="fc" id="L49">		Vector&lt;Course&gt; result = new Vector&lt;Course&gt;();</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">		for (Course c : courseList) {</span>
+<span class="fc" id="L51">			Vector&lt;Section&gt; matches = new Vector&lt;Section&gt;();</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">			for (int i = 0; i &lt; c.getNumSections(); ++i) {</span>
+<span class="fc" id="L53">				Section s = c.getSection(i);</span>
+<span class="fc" id="L54">				if (</span>
+<span class="pc bpc" id="L55" title="1 of 6 branches missed.">					((!filter[filterType.NO_EXCLUSION.ordinal()]) || (filter[filterType.NO_EXCLUSION.ordinal()]) &amp;&amp; (!c.hasExclusion()))		// NO_EXCLUSION Filter	</span>
+<span class="pc bpc" id="L56" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.LAB_TUTORIAL.ordinal()]) || (filter[filterType.LAB_TUTORIAL.ordinal()]) &amp;&amp; (c.hasLabTutorial()))	// LAB_TUTORIAL Filter</span>
+<span class="pc bpc" id="L57" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.CC.ordinal()]) || (filter[filterType.CC.ordinal()]) &amp;&amp; (c.isCC()))									// CC Filter</span>
+<span class="pc bpc" id="L58" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.AM.ordinal()]) || (filter[filterType.AM.ordinal()]) &amp;&amp; (s.hasTime(timeType.AM)))					// AM Filter</span>
+<span class="pc bpc" id="L59" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.PM.ordinal()]) || (filter[filterType.PM.ordinal()]) &amp;&amp; (s.hasTime(timeType.PM)))					// PM Filter</span>
+<span class="pc bpc" id="L60" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.MON.ordinal()]) || (filter[filterType.MON.ordinal()]) &amp;&amp; (s.hasDay(dayType.MON)))					// MON Filter</span>
+<span class="pc bpc" id="L61" title="2 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.TUE.ordinal()]) || (filter[filterType.TUE.ordinal()]) &amp;&amp; (s.hasDay(dayType.TUE)))					// TUE Filter</span>
+<span class="pc bpc" id="L62" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.WED.ordinal()]) || (filter[filterType.WED.ordinal()]) &amp;&amp; (s.hasDay(dayType.WED)))					// WED Filter</span>
+<span class="pc bpc" id="L63" title="2 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.THU.ordinal()]) || (filter[filterType.THU.ordinal()]) &amp;&amp; (s.hasDay(dayType.THU)))					// THU Filter</span>
+<span class="pc bpc" id="L64" title="1 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.FRI.ordinal()]) || (filter[filterType.FRI.ordinal()]) &amp;&amp; (s.hasDay(dayType.FRI)))					// FRI Filter</span>
+<span class="pc bpc" id="L65" title="2 of 6 branches missed.">					&amp;&amp; ((!filter[filterType.SAT.ordinal()]) || (filter[filterType.SAT.ordinal()]) &amp;&amp; (s.hasDay(dayType.SAT)))					// SAT Filter</span>
+				) {
+<span class="fc" id="L67">					matches.add(s);</span>
+				}
+			}
+<span class="fc bfc" id="L70" title="All 2 branches covered.">			if (!matches.isEmpty()) {</span>
+<span class="fc" id="L71">				Course t = c.cloneWithoutSections();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">				for (int j = 0; j &lt; matches.size(); ++j) {</span>
+<span class="fc" id="L73">					t.addSection(matches.get(j));</span>
+				}
+<span class="fc" id="L75">				result.add(t);</span>
+			}
+<span class="fc" id="L77">		}</span>
+<span class="fc" id="L78">		return result;</span>
+	}
+	
+	/**
+	 * Toggles on/off the selected filter given a boolean &lt;em&gt;input&lt;/em&gt;.
+	 * @param selection the filter to be activated/deactivated
+	 * @param input true for filter-activation; false for filter-deactivation
+	 */
+	public void setFilter(filterType selection, boolean input) {
+<span class="fc" id="L87">		filter[selection.ordinal()] = input;</span>
+<span class="fc" id="L88">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

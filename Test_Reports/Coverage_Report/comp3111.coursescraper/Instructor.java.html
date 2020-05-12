@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Instructor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">comp-3111-project</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">Instructor.java</span></div><h1>Instructor.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+/**
+ * Instructor class defines every instructor belonging to a section.
+ * &lt;br&gt;&lt;br&gt;
+ * Each Instructor contains both the first name and the last name of the instructor.
+ * @author thomas-chong
+ *
+ */
+public class Instructor {
+	private String firstName;
+	private String lastName;
+
+	
+	/**
+	 * Default constructor for Instructor class.
+	 */
+<span class="fc" id="L18">	public Instructor() {</span>
+<span class="fc" id="L19">		firstName = &quot;&quot;;</span>
+<span class="fc" id="L20">		lastName = &quot;&quot;;</span>
+<span class="fc" id="L21">	}</span>
+	
+	/**
+	 * Mutator function to modify instructor name, including first and last name.
+	 * @param firstName: firstName variable of String type
+	 * @param lastName: lastName variable of String type
+	 */
+	public void setInstructor(String firstName, String lastName) {
+<span class="fc" id="L29">		this.firstName = firstName;</span>
+<span class="fc" id="L30">		this.lastName = lastName;</span>
+<span class="fc" id="L31">	}</span>
+	
+	/**
+	 * Constructs and returns an identical Instructor object via deep-copying.
+	 * @return a Instructor object with identical attributes
+	 */
+	public Instructor clone() {
+<span class="fc" id="L38">		Instructor in = new Instructor();</span>
+<span class="fc" id="L39">		in.firstName = this.firstName;</span>
+<span class="fc" id="L40">		in.lastName = this.lastName;</span>
+<span class="fc" id="L41">		return in;</span>
+	}
+	
+	/**
+	 * Accessor function to obtain first name.
+	 * @return firstName of String type
+	 */
+	public String getFirstName() {
+<span class="fc" id="L49">		return firstName;</span>
+	}
+	
+	/**
+	 * Accessor function to obtain last name.
+	 * @return lastName of String type
+	 */
+	public String getLastName() {
+<span class="fc" id="L57">		return lastName;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
