@@ -2,10 +2,12 @@ package comp3111.coursescraper;
 
 import java.awt.event.ActionEvent;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -34,8 +36,12 @@ import java.util.List;
 import java.math.BigDecimal;
 
 /**
- * Placeholder
- * @author
+ * Controller class controls all boundary UI objects and and invokes necessary methods from other classes to manipulate data.
+ * <br><br>
+ * The boundary UI objects and their corresponding onAction methods are automatically generated and privately defined using JavaFX.
+ * <br><br>
+ * Persistent data are temporarily stored and kept track off in this class.
+ * @author lky-bulbasaur
  *
  */
 
@@ -173,6 +179,10 @@ public class Controller {
     	buttonSfqEnrollCourse.setDisable(true);
     }
     
+    /**
+     *  Fires when button "All Subject Search" is pressed.
+     *  Scraps subject and courses data from Base URL and term entered in Main Tab and prints the number of subjects and courses in the console.
+     */
     @FXML
     void allSubjectSearch() {
     	int ALL_SUBJECT_COUNT = 0;
@@ -180,41 +190,71 @@ public class Controller {
     	
     	List<String> subjectList = scraper.scrapeSubject(textfieldURL.getText(), textfieldTerm.getText());
     	
+    	progressbar.setProgress(0);
+    	
     	if (subjectList == null) {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Error 404. Please check your input again.");
     	}
-    	
-    	ALL_SUBJECT_COUNT = subjectList.size();
-    	
-    	textAreaConsole.setText("Total Number of Categories/Code Prefix: " + ALL_SUBJECT_COUNT + "\n\n");
-    	
-    	if (twiceClick) {
-    		Vector<Course> result = new Vector<Course>();
-	    		
-	    	int count = 0;
-	    	for (String subject : subjectList) {
-	    				
-	    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),subject);
-	    		
-	    		for (Course a : temp) {
-	    			result.add(a);
-	    		}
-	    		
-	    		System.out.println("SUBJECT is done.");
-	    		progressbar.setProgress(++count/ALL_SUBJECT_COUNT);
-	    	}
-	    	
-	    	courseList = result;
-	    	
-	    	TOTAL_NUMBER_OF_COURSES = courseList.size();
-	    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Courses fetched:  " + TOTAL_NUMBER_OF_COURSES + "\n\n");
-    	}
-    	
-    	if (!twiceClick) {
-    		twiceClick = true;
-    	}
+    	else {
+    		ALL_SUBJECT_COUNT = subjectList.size();
+        	
+    		String result1 = "Total Number of Categories/Code Prefix: " + ALL_SUBJECT_COUNT + "\n\n";
+    		
+        	textAreaConsole.setText(result1);
+        	
+        	if (twiceClick) {
+        		Vector<Course> result = new Vector<Course>();
+    	    		
+    	    	Task<Void> task = new Task<Void>() {
+    	    			@Override public Void call() {
+    	    				double count = 0;
+    	    				
+    	    				
+    	    				for (String subject : subjectList) {
+        	    				int x = 0;
+        	    				
+    	        	    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),subject);
+    	        	    		
+    	        	    		for (Course a : temp) {
+    	        	    			result.add(a);
+    	        	    			x++;
+    	        	    		}
+    	        	    		
+    	        	    		final double output = ++count/subjectList.size();
+    	        	    		final int output2 = result.size();
+    	        	    		//System.out.println(subject + ": " + x);	   		
+    	        	    		
+    	        	    		Platform.runLater(new Runnable() {
+    	        	    	        @Override public void run() {
+    	        	    	        	progressbar.setProgress(output);
+    	        	        	    	textAreaConsole.setText(result1 + "Total Number of Courses fetched:  " + output2 + "\n\n");
+    	        	    	        	System.out.println("SUBJECT is done.");
+    	        	    	        }
+    	        	    		}); 		
+    	        	    	}
+							return null;    				
+    	    		      }
+    	    	};
+    	    		
+    	    	Thread th = new Thread(task);
+    	    	th.setDaemon(true);
+    	    	th.start();
+        		
+    	    	courseList = result;
+    	    	TOTAL_NUMBER_OF_COURSES = courseList.size();
+    	    	
+    	    	// = courseList.size();
+    	    	textAreaConsole.setText(result1 + "Total Number of Courses fetched:  " + TOTAL_NUMBER_OF_COURSES + "\n\n");
+        	}
+        	
+        	if (!twiceClick) {
+        		twiceClick = true;
+        	}
 
-    	buttonSfqEnrollCourse.setDisable(false);
+        	buttonSfqEnrollCourse.setDisable(false);
+    	}
+    	
+    	
     	
     }
     
@@ -244,6 +284,10 @@ public class Controller {
     	printSFQConsole(sfqEnrolled, false);
     }
 
+    /**
+     *  Fires when button "Search" is pressed.
+     *  Scraps data from HKUST Course Schedule Website, display required information in console.
+     */
     @FXML
     void search() {
     	int NUMBER_OF_SECTIONS = 0;
@@ -256,104 +300,107 @@ public class Controller {
     	if (courseList == null) {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Error 404. Please check your input again.");
     	}
-    	
-    	for (Course c : courseList) {
-    		String newline = c.getCode() + " - " + c.getTitle() + "\n";
-    		boolean courseCount = true;
+    	else {
+        	for (Course c : courseList) {
+        		String newline = c.getCode() + " - " + c.getTitle() + "\n";
+        		boolean courseCount = true;
 
-    		int counter = 0;
-    		for (int i = 0; i < c.getNumSections(); i++) {
-    			Section s = c.getSection(i);
-    			for (int j = 0; j < s.getNumSlots(); j++) {
-    				Slot t = s.getSlot(j);
-    				newline += "Slot " + counter + ":" + t + "\n" + s.getSections() + " (" + s.getID() + ")\n";
-    				counter++;
-    			}
-    			if (!s.isValid()) {
-    				courseCount = false;
-    			}
-    		}
-    		if (courseCount) {
-    			NUMBER_OF_COURSES++;
-    		}
-    		NUMBER_OF_SECTIONS += c.getNumSections();
-    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
-    	}
-    	
-    	Vector<String> instructorList = new Vector<String>();
-    	Vector<String> uniqueInstructorList = new Vector<String>();
-    	Vector<String> blackList = new Vector<String>();
-    	
-    	for (Course c : courseList) {
-    		for (int i = 0; i < c.getNumSections(); i++) {
-    			Section s = c.getSection(i);
-    			int targetTime = 15*60 + 10;
-    			for (int j = 0; j < s.getNumSlots(); j++) {
-    				
-    				int day = s.getSlot(j).getDay();
-    				int startHour = s.getSlot(j).getStartHour();
-    				int endHour = s.getSlot(j).getEndHour();
-    				int startMinute = s.getSlot(j).getStartMinute();
-    				int endMinute = s.getSlot(j).getEndMinute();
-    				
-    				
-    				for (int k = 0; k < s.getNumInstructors(); k++) {
-    					String name = s.getInstructor(k).getLastName() + ", " + s.getInstructor(k).getFirstName();
-    					instructorList.add(name);
-					}
-    			}
-    		}
-    	}
-    	
-    	for (String a : instructorList) {
-    		String temp = a;
-    		temp = temp.trim();
-    		if (!uniqueInstructorList.contains(temp) && !temp.equals("null, null")) {
-    			uniqueInstructorList.add(temp);
-    		}
-    	}
-    	
-    	for (Course c : courseList) {
-    		for (int i = 0; i < c.getNumSections(); i++) {
-    			Section s = c.getSection(i);
-    			int targetTime = 15*60 + 10;
-    			for (int j = 0; j < s.getNumSlots(); j++) {
-    				int day = s.getSlot(j).getDay();
-    				int startHour = s.getSlot(j).getStartHour();
-    				int endHour = s.getSlot(j).getEndHour();
-    				int startMinute = s.getSlot(j).getStartMinute();
-    				int endMinute = s.getSlot(j).getEndMinute();
-    				
-    				if (day == 1 && (startHour * 60 + startMinute) <= targetTime && (endHour * 60 + endMinute) >= targetTime) {
-    					for (int k = 0; k < s.getNumInstructors(); k++) {
-    						String name = s.getInstructor(k).getLastName() + ", " + s.getInstructor(k).getFirstName();
-    						name = name.trim();
-        					if (!blackList.contains(name)) {
-        						blackList.add(name);
-        					}			
+        		int counter = 0;
+        		for (int i = 0; i < c.getNumSections(); i++) {
+        			Section s = c.getSection(i);
+        			for (int j = 0; j < s.getNumSlots(); j++) {
+        				Slot t = s.getSlot(j);
+        				newline += "Slot " + counter + ":" + t + "\n" + s.getSections() + " (" + s.getID() + ")\n";
+        				counter++;
+        			}
+        			if (!s.isValid()) {
+        				courseCount = false;
+        			}
+        		}
+        		if (courseCount) {
+        			NUMBER_OF_COURSES++;
+        		}
+        		NUMBER_OF_SECTIONS += c.getNumSections();
+        		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+        	}
+        	
+        	Vector<String> instructorList = new Vector<String>();
+        	Vector<String> uniqueInstructorList = new Vector<String>();
+        	Vector<String> blackList = new Vector<String>();
+        	
+        	for (Course c : courseList) {
+        		for (int i = 0; i < c.getNumSections(); i++) {
+        			Section s = c.getSection(i);
+        			int targetTime = 15*60 + 10;
+        			for (int j = 0; j < s.getNumSlots(); j++) {
+        				
+        				int day = s.getSlot(j).getDay();
+        				int startHour = s.getSlot(j).getStartHour();
+        				int endHour = s.getSlot(j).getEndHour();
+        				int startMinute = s.getSlot(j).getStartMinute();
+        				int endMinute = s.getSlot(j).getEndMinute();
+        				
+        				
+        				for (int k = 0; k < s.getNumInstructors(); k++) {
+        					String name = s.getInstructor(k).getLastName() + ", " + s.getInstructor(k).getFirstName();
+        					instructorList.add(name);
     					}
-    				}
-    			}
-    		}
+        			}
+        		}
+        	}
+        	
+        	for (String a : instructorList) {
+        		String temp = a;
+        		temp = temp.trim();
+        		if (!uniqueInstructorList.contains(temp) && !temp.equals("null, null")) {
+        			uniqueInstructorList.add(temp);
+        		}
+        	}
+        	
+        	for (Course c : courseList) {
+        		for (int i = 0; i < c.getNumSections(); i++) {
+        			Section s = c.getSection(i);
+        			int targetTime = 15*60 + 10;
+        			for (int j = 0; j < s.getNumSlots(); j++) {
+        				int day = s.getSlot(j).getDay();
+        				int startHour = s.getSlot(j).getStartHour();
+        				int endHour = s.getSlot(j).getEndHour();
+        				int startMinute = s.getSlot(j).getStartMinute();
+        				int endMinute = s.getSlot(j).getEndMinute();
+        				
+        				if (day == 1 && (startHour * 60 + startMinute) <= targetTime && (endHour * 60 + endMinute) >= targetTime) {
+        					for (int k = 0; k < s.getNumInstructors(); k++) {
+        						String name = s.getInstructor(k).getLastName() + ", " + s.getInstructor(k).getFirstName();
+        						name = name.trim();
+            					if (!blackList.contains(name)) {
+            						blackList.add(name);
+            					}			
+        					}
+        				}
+        			}
+        		}
+        	}
+        	
+        	Collections.sort(uniqueInstructorList);
+        	
+        	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of difference sections in this search: " + NUMBER_OF_SECTIONS);
+        	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of Course in this search: " + NUMBER_OF_COURSES);
+        	
+        	String output = "";
+        	for (String a : uniqueInstructorList) {
+        		if (!blackList.contains(a)) {
+        			output += a + ", \n";
+        		}
+        		//else {
+        			//System.out.println(a);
+        		//}
+        		
+        	}
+    	
+        	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Display Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: "+ "\n" + output);
     	}
     	
-    	Collections.sort(uniqueInstructorList);
-    	
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of difference sections in this search: " + NUMBER_OF_SECTIONS);
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Total Number of Course in this search: " + NUMBER_OF_COURSES);
-    	
-    	String output = "";
-    	for (String a : uniqueInstructorList) {
-    		if (!blackList.contains(a)) {
-    			output += a + ", \n";
-    		}
-    		//else {
-    			//System.out.println(a);
-    		//}
-    		
-    	}
-	
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Display Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: "+ "\n" + output);
+
     	
     	/* Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
