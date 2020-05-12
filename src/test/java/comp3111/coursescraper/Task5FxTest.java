@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -36,6 +37,7 @@ public class Task5FxTest extends ApplicationTest{
 	// This test is to test the functionality of the search all button when clicking the first time and second time
 	public void searchAll() {
 		TextArea console = (TextArea)s.lookup("#textAreaConsole");
+		ProgressBar progressbar = (ProgressBar)s.lookup("#progressbar");;
 		clickOn("#tabAllSubject");
 		Button b = (Button)s.lookup("#buttonAllSearch");
 		clickOn(b);
@@ -45,6 +47,7 @@ public class Task5FxTest extends ApplicationTest{
 				"\n" + 
 				"");
 		clickOn(b);
+		while (progressbar.getProgress() != 1.0) { }
 		sleep(2000);
 		assertEquals(console.getText(), "Total Number of Categories/Code Prefix: 75\n" + 
 				"\n" + 

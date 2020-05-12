@@ -2,10 +2,12 @@ package comp3111.coursescraper;
 
 import java.awt.event.ActionEvent;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -184,34 +186,61 @@ public class Controller {
     	
     	List<String> subjectList = scraper.scrapeSubject(textfieldURL.getText(), textfieldTerm.getText());
     	
+    	progressbar.setProgress(0);
+    	
     	if (subjectList == null) {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + "Error 404. Please check your input again.");
     	}
     	else {
     		ALL_SUBJECT_COUNT = subjectList.size();
         	
-        	textAreaConsole.setText("Total Number of Categories/Code Prefix: " + ALL_SUBJECT_COUNT + "\n\n");
+    		String result1 = "Total Number of Categories/Code Prefix: " + ALL_SUBJECT_COUNT + "\n\n";
+    		
+        	textAreaConsole.setText(result1);
         	
         	if (twiceClick) {
         		Vector<Course> result = new Vector<Course>();
     	    		
-    	    	int count = 0;
-    	    	for (String subject : subjectList) {
+    	    	Task<Void> task = new Task<Void>() {
+    	    			@Override public Void call() {
+    	    				double count = 0;
     	    				
-    	    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),subject);
+    	    				
+    	    				for (String subject : subjectList) {
+        	    				int x = 0;
+        	    				
+    	        	    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),subject);
+    	        	    		
+    	        	    		for (Course a : temp) {
+    	        	    			result.add(a);
+    	        	    			x++;
+    	        	    		}
+    	        	    		
+    	        	    		final double output = ++count/subjectList.size();
+    	        	    		final int output2 = result.size();
+    	        	    		//System.out.println(subject + ": " + x);	   		
+    	        	    		
+    	        	    		Platform.runLater(new Runnable() {
+    	        	    	        @Override public void run() {
+    	        	    	        	progressbar.setProgress(output);
+    	        	        	    	textAreaConsole.setText(result1 + "Total Number of Courses fetched:  " + output2 + "\n\n");
+    	        	    	        	System.out.println("SUBJECT is done.");
+    	        	    	        }
+    	        	    		}); 		
+    	        	    	}
+							return null;    				
+    	    		      }
+    	    	};
     	    		
-    	    		for (Course a : temp) {
-    	    			result.add(a);
-    	    		}
-    	    		
-    	    		System.out.println("SUBJECT is done.");
-    	    		progressbar.setProgress(++count/ALL_SUBJECT_COUNT);
-    	    	}
-    	    	
+    	    	Thread th = new Thread(task);
+    	    	th.setDaemon(true);
+    	    	th.start();
+        		
     	    	courseList = result;
-    	    	
     	    	TOTAL_NUMBER_OF_COURSES = courseList.size();
-    	    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Courses fetched:  " + TOTAL_NUMBER_OF_COURSES + "\n\n");
+    	    	
+    	    	// = courseList.size();
+    	    	textAreaConsole.setText(result1 + "Total Number of Courses fetched:  " + TOTAL_NUMBER_OF_COURSES + "\n\n");
         	}
         	
         	if (!twiceClick) {
@@ -251,6 +280,10 @@ public class Controller {
     	printSFQConsole(sfqEnrolled, false);
     }
 
+    /**
+     *  Fires when button "Search" is pressed.
+     *  Scraps data from HKUST Course Schedule Website, display required information in console.
+     */
     @FXML
     void search() {
     	int NUMBER_OF_SECTIONS = 0;

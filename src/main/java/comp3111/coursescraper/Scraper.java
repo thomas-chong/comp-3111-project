@@ -119,8 +119,11 @@ public class Scraper {
 	 * Scraper function to obtain data from HKUST class schedule and quota page.
 	 * Constructs and populates a List of Courses containing their corresponding Course, Section and Slot information. 
 	 * @param baseurl: base URL of HKUST class schedule and quota page
+	 * @param term: the selection of certain term
+	 * @param sub: the selection of certain subject code
 	 * @return A list of Courses their corresponding Course, Section and Slot information. 
 	 */
+
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {
@@ -200,6 +203,7 @@ public class Scraper {
 	/**
 	 * Scraper function to obtain data from HKUST class schedule and quota page.
 	 * Organize a list of types of subjects in that particular term.
+	 * @param baseurl: base URL of HKUST class schedule and quota page
 	 * @param baseurl: base URL of HKUST class schedule and quota page
 	 * @return A list of String class objects which consists different types of subjects
 	 */
