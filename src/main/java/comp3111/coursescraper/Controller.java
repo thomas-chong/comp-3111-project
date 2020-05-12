@@ -34,8 +34,12 @@ import java.util.List;
 import java.math.BigDecimal;
 
 /**
- * Placeholder
- * @author
+ * Controller class controls all boundary UI objects and and invokes necessary methods from other classes to manipulate data.
+ * <br><br>
+ * The boundary UI objects and their corresponding onAction methods are automatically generated and privately defined using JavaFX.
+ * <br><br>
+ * Persistent data are temporarily stored and kept track off in this class.
+ * @author lky-bulbasaur
  *
  */
 
